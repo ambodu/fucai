@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.2.15",
+    "lastTouchedAt": "2026-02-15T07:29:19.427Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-02-15T07:29:19.417Z",
+    "lastRunVersion": "2026.2.15",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "providers": {
+    "anyrouter": {
+      "baseUrl": "https://anyrouter.top",
+      "apiKey": "sk-u263Pu6b6EMcgQxypY2ngMMThMUKb6OpsN0jBcJxoqeKaun8",
+      "api": "anthropic-messages",
+      "models": [
+        {
+          "id": "claude-opus-4-6",
+          "name": "Claude Opus 4.6",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "contextWindow": 200000,
+          "maxTokens": 8192
+        }
+      ]
+    }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/home/codespace/.openclaw/workspace",
+      "model": {
+        "primary": "anyrouter/claude-opus-4-6"
+      },
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto"
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "appId": "cli_a91bcd6e68789bcb",
+      "appSecret": "clDUflfp9pjAdrox2JRPSgqsrsDPpaE8",
+      "domain": "feishu",
+      "groupPolicy": "open"
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "12470021f61aa1fe3e355fd017b3bb5039916abfe313da7a"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "calendar.add",
+        "contacts.add",
+        "reminders.add"
+      ]
+    }
+  },
+  "plugins": {
+    "entries": {
+      "feishu": {
+        "path": "/workspaces/openclaw/extensions/feishu/index.ts",
+        "enabled": true
+      }
+    }
+  }
+}

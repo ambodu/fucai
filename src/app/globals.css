@@ -2,26 +2,148 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@layer base {
+  :root {
+    --background: 216 21% 4%;
+    --foreground: 210 40% 96%;
+    --card: 216 17% 9%;
+    --card-foreground: 210 40% 96%;
+    --popover: 216 15% 12%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 263 89% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 100% / 0.05;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 0 0% 100% / 0.05;
+    --muted-foreground: 217 10% 64%;
+    --accent: 167 100% 42%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 77% 56%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 263 89% 58%;
+    --chart-1: 263 89% 58%;
+    --chart-2: 167 100% 42%;
+    --chart-3: 29 80% 52%;
+    --chart-4: 204 70% 53%;
+    --chart-5: 4 77% 56%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  }
+}
+
+/* FC3D Ball styles */
+.ball {
+  @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0;
+}
+
+.ball-lg {
+  @apply w-12 h-12 text-lg;
+}
+
+.ball-sm {
+  @apply w-7 h-7 text-xs;
+}
+
+.ball-red,
+.ball-purple {
+  background: linear-gradient(135deg, #7434f3, #9b59b6);
+  box-shadow: 0 2px 6px rgba(116, 52, 243, 0.3);
+}
+
+.ball-orange,
+.ball-neon {
+  background: linear-gradient(135deg, #00d4aa, #00b894);
+  box-shadow: 0 2px 6px rgba(0, 212, 170, 0.3);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Trend Table styles - Dark theme */
+.trend-table {
+  @apply w-full border-collapse text-xs;
+}
+.trend-table th {
+  @apply sticky top-0 border px-1 py-2 text-center font-semibold text-gray-400 z-10;
+  background-color: #1a1d23;
+  border-color: rgba(255, 255, 255, 0.05);
+  min-width: 32px;
+}
+.trend-table td {
+  @apply px-0.5 py-1 text-center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 32px;
+  height: 32px;
+}
+.trend-table .period-col {
+  @apply sticky left-0 z-20 font-medium text-gray-300 text-[11px];
+  background-color: #13161b;
+  min-width: 52px;
+}
+.trend-table thead th.period-col {
+  @apply z-30;
+  background-color: #1a1d23;
+}
+.trend-table .position-header {
+  @apply font-bold text-[11px];
+  background-color: rgba(116, 52, 243, 0.1);
+  color: #7434f3;
+}
+.trend-table .extra-col {
+  @apply text-gray-400 font-semibold text-[11px];
+  background-color: #1a1d23;
+  min-width: 40px;
+}
+.trend-table .extra-col-value {
+  @apply text-[11px] font-semibold;
+  color: #00d4aa;
+  background-color: rgba(0, 212, 170, 0.05);
+}
+.trend-stats-row td {
+  @apply font-semibold text-gray-400;
+  background-color: #1a1d23;
+}
+.trend-table tbody tr:nth-child(5n) {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Glass card utility */
+.glass-card {
+  background: rgba(19, 22, 27, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+}
+
+/* Glow utilities */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(116, 52, 243, 0.2);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(116, 52, 243, 0.5), 0 0 20px rgba(116, 52, 243, 0.3);
 }

@@ -1,0 +1,1406 @@
+{
+  "lastUpdated": "2026-02-15T07:13:19.337Z",
+  "totalCount": 200,
+  "draws": [
+    {
+      "period": "2026044",
+      "date": "2026-02-13",
+      "digit1": 5,
+      "digit2": 8,
+      "digit3": 9
+    },
+    {
+      "period": "2026043",
+      "date": "2026-02-12",
+      "digit1": 7,
+      "digit2": 6,
+      "digit3": 5
+    },
+    {
+      "period": "2026042",
+      "date": "2026-02-11",
+      "digit1": 8,
+      "digit2": 5,
+      "digit3": 4
+    },
+    {
+      "period": "2026041",
+      "date": "2026-02-10",
+      "digit1": 9,
+      "digit2": 0,
+      "digit3": 1
+    },
+    {
+      "period": "2026040",
+      "date": "2026-02-09",
+      "digit1": 4,
+      "digit2": 2,
+      "digit3": 5
+    },
+    {
+      "period": "2026039",
+      "date": "2026-02-08",
+      "digit1": 4,
+      "digit2": 5,
+      "digit3": 0
+    },
+    {
+      "period": "2026038",
+      "date": "2026-02-07",
+      "digit1": 4,
+      "digit2": 6,
+      "digit3": 7
+    },
+    {
+      "period": "2026037",
+      "date": "2026-02-06",
+      "digit1": 4,
+      "digit2": 2,
+      "digit3": 0
+    },
+    {
+      "period": "2026036",
+      "date": "2026-02-05",
+      "digit1": 7,
+      "digit2": 6,
+      "digit3": 2
+    },
+    {
+      "period": "2026035",
+      "date": "2026-02-04",
+      "digit1": 2,
+      "digit2": 1,
+      "digit3": 3
+    },
+    {
+      "period": "2026034",
+      "date": "2026-02-03",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 2
+    },
+    {
+      "period": "2026033",
+      "date": "2026-02-02",
+      "digit1": 1,
+      "digit2": 1,
+      "digit3": 9
+    },
+    {
+      "period": "2026032",
+      "date": "2026-02-01",
+      "digit1": 4,
+      "digit2": 5,
+      "digit3": 2
+    },
+    {
+      "period": "2026031",
+      "date": "2026-01-31",
+      "digit1": 1,
+      "digit2": 4,
+      "digit3": 2
+    },
+    {
+      "period": "2026030",
+      "date": "2026-01-30",
+      "digit1": 1,
+      "digit2": 3,
+      "digit3": 4
+    },
+    {
+      "period": "2026029",
+      "date": "2026-01-29",
+      "digit1": 0,
+      "digit2": 0,
+      "digit3": 3
+    },
+    {
+      "period": "2026028",
+      "date": "2026-01-28",
+      "digit1": 2,
+      "digit2": 7,
+      "digit3": 0
+    },
+    {
+      "period": "2026027",
+      "date": "2026-01-27",
+      "digit1": 1,
+      "digit2": 2,
+      "digit3": 6
+    },
+    {
+      "period": "2026026",
+      "date": "2026-01-26",
+      "digit1": 0,
+      "digit2": 9,
+      "digit3": 9
+    },
+    {
+      "period": "2026025",
+      "date": "2026-01-25",
+      "digit1": 0,
+      "digit2": 2,
+      "digit3": 9
+    },
+    {
+      "period": "2026024",
+      "date": "2026-01-24",
+      "digit1": 9,
+      "digit2": 1,
+      "digit3": 1
+    },
+    {
+      "period": "2026023",
+      "date": "2026-01-23",
+      "digit1": 7,
+      "digit2": 8,
+      "digit3": 4
+    },
+    {
+      "period": "2026022",
+      "date": "2026-01-22",
+      "digit1": 6,
+      "digit2": 7,
+      "digit3": 8
+    },
+    {
+      "period": "2026021",
+      "date": "2026-01-21",
+      "digit1": 5,
+      "digit2": 5,
+      "digit3": 9
+    },
+    {
+      "period": "2026020",
+      "date": "2026-01-20",
+      "digit1": 6,
+      "digit2": 7,
+      "digit3": 6
+    },
+    {
+      "period": "2026019",
+      "date": "2026-01-19",
+      "digit1": 2,
+      "digit2": 2,
+      "digit3": 3
+    },
+    {
+      "period": "2026018",
+      "date": "2026-01-18",
+      "digit1": 4,
+      "digit2": 9,
+      "digit3": 4
+    },
+    {
+      "period": "2026017",
+      "date": "2026-01-17",
+      "digit1": 9,
+      "digit2": 4,
+      "digit3": 5
+    },
+    {
+      "period": "2026016",
+      "date": "2026-01-16",
+      "digit1": 5,
+      "digit2": 8,
+      "digit3": 2
+    },
+    {
+      "period": "2026015",
+      "date": "2026-01-15",
+      "digit1": 5,
+      "digit2": 3,
+      "digit3": 2
+    },
+    {
+      "period": "2026014",
+      "date": "2026-01-14",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 0
+    },
+    {
+      "period": "2026013",
+      "date": "2026-01-13",
+      "digit1": 5,
+      "digit2": 1,
+      "digit3": 3
+    },
+    {
+      "period": "2026012",
+      "date": "2026-01-12",
+      "digit1": 2,
+      "digit2": 4,
+      "digit3": 1
+    },
+    {
+      "period": "2026011",
+      "date": "2026-01-11",
+      "digit1": 6,
+      "digit2": 4,
+      "digit3": 7
+    },
+    {
+      "period": "2026010",
+      "date": "2026-01-10",
+      "digit1": 6,
+      "digit2": 6,
+      "digit3": 7
+    },
+    {
+      "period": "2026009",
+      "date": "2026-01-09",
+      "digit1": 2,
+      "digit2": 6,
+      "digit3": 5
+    },
+    {
+      "period": "2026008",
+      "date": "2026-01-08",
+      "digit1": 2,
+      "digit2": 5,
+      "digit3": 2
+    },
+    {
+      "period": "2026007",
+      "date": "2026-01-07",
+      "digit1": 3,
+      "digit2": 5,
+      "digit3": 3
+    },
+    {
+      "period": "2026006",
+      "date": "2026-01-06",
+      "digit1": 2,
+      "digit2": 4,
+      "digit3": 4
+    },
+    {
+      "period": "2026005",
+      "date": "2026-01-05",
+      "digit1": 4,
+      "digit2": 7,
+      "digit3": 6
+    },
+    {
+      "period": "2026004",
+      "date": "2026-01-04",
+      "digit1": 0,
+      "digit2": 1,
+      "digit3": 9
+    },
+    {
+      "period": "2026003",
+      "date": "2026-01-03",
+      "digit1": 6,
+      "digit2": 0,
+      "digit3": 1
+    },
+    {
+      "period": "2026002",
+      "date": "2026-01-02",
+      "digit1": 5,
+      "digit2": 2,
+      "digit3": 0
+    },
+    {
+      "period": "2026001",
+      "date": "2026-01-01",
+      "digit1": 2,
+      "digit2": 9,
+      "digit3": 8
+    },
+    {
+      "period": "2025351",
+      "date": "2025-12-31",
+      "digit1": 4,
+      "digit2": 5,
+      "digit3": 2
+    },
+    {
+      "period": "2025350",
+      "date": "2025-12-30",
+      "digit1": 5,
+      "digit2": 8,
+      "digit3": 0
+    },
+    {
+      "period": "2025349",
+      "date": "2025-12-29",
+      "digit1": 7,
+      "digit2": 4,
+      "digit3": 3
+    },
+    {
+      "period": "2025348",
+      "date": "2025-12-28",
+      "digit1": 2,
+      "digit2": 7,
+      "digit3": 8
+    },
+    {
+      "period": "2025347",
+      "date": "2025-12-27",
+      "digit1": 1,
+      "digit2": 9,
+      "digit3": 2
+    },
+    {
+      "period": "2025346",
+      "date": "2025-12-26",
+      "digit1": 8,
+      "digit2": 9,
+      "digit3": 7
+    },
+    {
+      "period": "2025345",
+      "date": "2025-12-25",
+      "digit1": 6,
+      "digit2": 3,
+      "digit3": 0
+    },
+    {
+      "period": "2025344",
+      "date": "2025-12-24",
+      "digit1": 6,
+      "digit2": 2,
+      "digit3": 2
+    },
+    {
+      "period": "2025343",
+      "date": "2025-12-23",
+      "digit1": 6,
+      "digit2": 4,
+      "digit3": 5
+    },
+    {
+      "period": "2025342",
+      "date": "2025-12-22",
+      "digit1": 6,
+      "digit2": 8,
+      "digit3": 1
+    },
+    {
+      "period": "2025341",
+      "date": "2025-12-21",
+      "digit1": 9,
+      "digit2": 9,
+      "digit3": 6
+    },
+    {
+      "period": "2025340",
+      "date": "2025-12-20",
+      "digit1": 1,
+      "digit2": 3,
+      "digit3": 0
+    },
+    {
+      "period": "2025339",
+      "date": "2025-12-19",
+      "digit1": 6,
+      "digit2": 7,
+      "digit3": 6
+    },
+    {
+      "period": "2025338",
+      "date": "2025-12-18",
+      "digit1": 6,
+      "digit2": 8,
+      "digit3": 9
+    },
+    {
+      "period": "2025337",
+      "date": "2025-12-17",
+      "digit1": 8,
+      "digit2": 7,
+      "digit3": 6
+    },
+    {
+      "period": "2025336",
+      "date": "2025-12-16",
+      "digit1": 6,
+      "digit2": 4,
+      "digit3": 1
+    },
+    {
+      "period": "2025335",
+      "date": "2025-12-15",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 1
+    },
+    {
+      "period": "2025334",
+      "date": "2025-12-14",
+      "digit1": 1,
+      "digit2": 9,
+      "digit3": 8
+    },
+    {
+      "period": "2025333",
+      "date": "2025-12-13",
+      "digit1": 2,
+      "digit2": 7,
+      "digit3": 3
+    },
+    {
+      "period": "2025332",
+      "date": "2025-12-12",
+      "digit1": 8,
+      "digit2": 8,
+      "digit3": 5
+    },
+    {
+      "period": "2025331",
+      "date": "2025-12-11",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 0
+    },
+    {
+      "period": "2025330",
+      "date": "2025-12-10",
+      "digit1": 0,
+      "digit2": 6,
+      "digit3": 2
+    },
+    {
+      "period": "2025329",
+      "date": "2025-12-09",
+      "digit1": 5,
+      "digit2": 6,
+      "digit3": 4
+    },
+    {
+      "period": "2025328",
+      "date": "2025-12-08",
+      "digit1": 0,
+      "digit2": 4,
+      "digit3": 0
+    },
+    {
+      "period": "2025327",
+      "date": "2025-12-07",
+      "digit1": 7,
+      "digit2": 8,
+      "digit3": 9
+    },
+    {
+      "period": "2025326",
+      "date": "2025-12-06",
+      "digit1": 1,
+      "digit2": 8,
+      "digit3": 5
+    },
+    {
+      "period": "2025325",
+      "date": "2025-12-05",
+      "digit1": 1,
+      "digit2": 6,
+      "digit3": 5
+    },
+    {
+      "period": "2025324",
+      "date": "2025-12-04",
+      "digit1": 6,
+      "digit2": 6,
+      "digit3": 1
+    },
+    {
+      "period": "2025323",
+      "date": "2025-12-03",
+      "digit1": 5,
+      "digit2": 5,
+      "digit3": 1
+    },
+    {
+      "period": "2025322",
+      "date": "2025-12-02",
+      "digit1": 2,
+      "digit2": 2,
+      "digit3": 6
+    },
+    {
+      "period": "2025321",
+      "date": "2025-12-01",
+      "digit1": 8,
+      "digit2": 4,
+      "digit3": 7
+    },
+    {
+      "period": "2025320",
+      "date": "2025-11-30",
+      "digit1": 1,
+      "digit2": 2,
+      "digit3": 1
+    },
+    {
+      "period": "2025319",
+      "date": "2025-11-29",
+      "digit1": 2,
+      "digit2": 9,
+      "digit3": 4
+    },
+    {
+      "period": "2025318",
+      "date": "2025-11-28",
+      "digit1": 4,
+      "digit2": 3,
+      "digit3": 0
+    },
+    {
+      "period": "2025317",
+      "date": "2025-11-27",
+      "digit1": 3,
+      "digit2": 0,
+      "digit3": 1
+    },
+    {
+      "period": "2025316",
+      "date": "2025-11-26",
+      "digit1": 7,
+      "digit2": 7,
+      "digit3": 5
+    },
+    {
+      "period": "2025315",
+      "date": "2025-11-25",
+      "digit1": 7,
+      "digit2": 2,
+      "digit3": 9
+    },
+    {
+      "period": "2025314",
+      "date": "2025-11-24",
+      "digit1": 9,
+      "digit2": 1,
+      "digit3": 7
+    },
+    {
+      "period": "2025313",
+      "date": "2025-11-23",
+      "digit1": 6,
+      "digit2": 6,
+      "digit3": 4
+    },
+    {
+      "period": "2025312",
+      "date": "2025-11-22",
+      "digit1": 6,
+      "digit2": 8,
+      "digit3": 9
+    },
+    {
+      "period": "2025311",
+      "date": "2025-11-21",
+      "digit1": 6,
+      "digit2": 4,
+      "digit3": 0
+    },
+    {
+      "period": "2025310",
+      "date": "2025-11-20",
+      "digit1": 1,
+      "digit2": 6,
+      "digit3": 9
+    },
+    {
+      "period": "2025309",
+      "date": "2025-11-19",
+      "digit1": 1,
+      "digit2": 9,
+      "digit3": 0
+    },
+    {
+      "period": "2025308",
+      "date": "2025-11-18",
+      "digit1": 4,
+      "digit2": 4,
+      "digit3": 8
+    },
+    {
+      "period": "2025307",
+      "date": "2025-11-17",
+      "digit1": 1,
+      "digit2": 6,
+      "digit3": 4
+    },
+    {
+      "period": "2025306",
+      "date": "2025-11-16",
+      "digit1": 6,
+      "digit2": 9,
+      "digit3": 7
+    },
+    {
+      "period": "2025305",
+      "date": "2025-11-15",
+      "digit1": 3,
+      "digit2": 1,
+      "digit3": 0
+    },
+    {
+      "period": "2025304",
+      "date": "2025-11-14",
+      "digit1": 4,
+      "digit2": 7,
+      "digit3": 1
+    },
+    {
+      "period": "2025303",
+      "date": "2025-11-13",
+      "digit1": 9,
+      "digit2": 3,
+      "digit3": 3
+    },
+    {
+      "period": "2025302",
+      "date": "2025-11-12",
+      "digit1": 7,
+      "digit2": 1,
+      "digit3": 5
+    },
+    {
+      "period": "2025301",
+      "date": "2025-11-11",
+      "digit1": 7,
+      "digit2": 5,
+      "digit3": 5
+    },
+    {
+      "period": "2025300",
+      "date": "2025-11-10",
+      "digit1": 8,
+      "digit2": 6,
+      "digit3": 7
+    },
+    {
+      "period": "2025299",
+      "date": "2025-11-09",
+      "digit1": 3,
+      "digit2": 8,
+      "digit3": 5
+    },
+    {
+      "period": "2025298",
+      "date": "2025-11-08",
+      "digit1": 5,
+      "digit2": 4,
+      "digit3": 4
+    },
+    {
+      "period": "2025297",
+      "date": "2025-11-07",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 1
+    },
+    {
+      "period": "2025296",
+      "date": "2025-11-06",
+      "digit1": 5,
+      "digit2": 3,
+      "digit3": 7
+    },
+    {
+      "period": "2025295",
+      "date": "2025-11-05",
+      "digit1": 2,
+      "digit2": 7,
+      "digit3": 3
+    },
+    {
+      "period": "2025294",
+      "date": "2025-11-04",
+      "digit1": 5,
+      "digit2": 1,
+      "digit3": 3
+    },
+    {
+      "period": "2025293",
+      "date": "2025-11-03",
+      "digit1": 1,
+      "digit2": 5,
+      "digit3": 4
+    },
+    {
+      "period": "2025292",
+      "date": "2025-11-02",
+      "digit1": 1,
+      "digit2": 1,
+      "digit3": 7
+    },
+    {
+      "period": "2025291",
+      "date": "2025-11-01",
+      "digit1": 7,
+      "digit2": 9,
+      "digit3": 4
+    },
+    {
+      "period": "2025290",
+      "date": "2025-10-31",
+      "digit1": 3,
+      "digit2": 3,
+      "digit3": 2
+    },
+    {
+      "period": "2025289",
+      "date": "2025-10-30",
+      "digit1": 4,
+      "digit2": 7,
+      "digit3": 3
+    },
+    {
+      "period": "2025288",
+      "date": "2025-10-29",
+      "digit1": 7,
+      "digit2": 6,
+      "digit3": 7
+    },
+    {
+      "period": "2025287",
+      "date": "2025-10-28",
+      "digit1": 8,
+      "digit2": 0,
+      "digit3": 5
+    },
+    {
+      "period": "2025286",
+      "date": "2025-10-27",
+      "digit1": 8,
+      "digit2": 2,
+      "digit3": 7
+    },
+    {
+      "period": "2025285",
+      "date": "2025-10-26",
+      "digit1": 1,
+      "digit2": 7,
+      "digit3": 2
+    },
+    {
+      "period": "2025284",
+      "date": "2025-10-25",
+      "digit1": 8,
+      "digit2": 4,
+      "digit3": 4
+    },
+    {
+      "period": "2025283",
+      "date": "2025-10-24",
+      "digit1": 6,
+      "digit2": 6,
+      "digit3": 4
+    },
+    {
+      "period": "2025282",
+      "date": "2025-10-23",
+      "digit1": 4,
+      "digit2": 1,
+      "digit3": 6
+    },
+    {
+      "period": "2025281",
+      "date": "2025-10-22",
+      "digit1": 8,
+      "digit2": 9,
+      "digit3": 7
+    },
+    {
+      "period": "2025280",
+      "date": "2025-10-21",
+      "digit1": 4,
+      "digit2": 1,
+      "digit3": 1
+    },
+    {
+      "period": "2025279",
+      "date": "2025-10-20",
+      "digit1": 7,
+      "digit2": 5,
+      "digit3": 2
+    },
+    {
+      "period": "2025278",
+      "date": "2025-10-19",
+      "digit1": 6,
+      "digit2": 2,
+      "digit3": 9
+    },
+    {
+      "period": "2025277",
+      "date": "2025-10-18",
+      "digit1": 0,
+      "digit2": 6,
+      "digit3": 1
+    },
+    {
+      "period": "2025276",
+      "date": "2025-10-17",
+      "digit1": 7,
+      "digit2": 1,
+      "digit3": 4
+    },
+    {
+      "period": "2025275",
+      "date": "2025-10-16",
+      "digit1": 2,
+      "digit2": 0,
+      "digit3": 3
+    },
+    {
+      "period": "2025274",
+      "date": "2025-10-15",
+      "digit1": 5,
+      "digit2": 9,
+      "digit3": 6
+    },
+    {
+      "period": "2025273",
+      "date": "2025-10-14",
+      "digit1": 0,
+      "digit2": 4,
+      "digit3": 5
+    },
+    {
+      "period": "2025272",
+      "date": "2025-10-13",
+      "digit1": 9,
+      "digit2": 6,
+      "digit3": 7
+    },
+    {
+      "period": "2025271",
+      "date": "2025-10-12",
+      "digit1": 7,
+      "digit2": 2,
+      "digit3": 7
+    },
+    {
+      "period": "2025270",
+      "date": "2025-10-11",
+      "digit1": 4,
+      "digit2": 0,
+      "digit3": 8
+    },
+    {
+      "period": "2025269",
+      "date": "2025-10-10",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 5
+    },
+    {
+      "period": "2025268",
+      "date": "2025-10-09",
+      "digit1": 6,
+      "digit2": 7,
+      "digit3": 4
+    },
+    {
+      "period": "2025267",
+      "date": "2025-10-08",
+      "digit1": 3,
+      "digit2": 9,
+      "digit3": 1
+    },
+    {
+      "period": "2025266",
+      "date": "2025-10-07",
+      "digit1": 7,
+      "digit2": 2,
+      "digit3": 3
+    },
+    {
+      "period": "2025265",
+      "date": "2025-10-06",
+      "digit1": 5,
+      "digit2": 4,
+      "digit3": 6
+    },
+    {
+      "period": "2025264",
+      "date": "2025-10-05",
+      "digit1": 7,
+      "digit2": 3,
+      "digit3": 4
+    },
+    {
+      "period": "2025263",
+      "date": "2025-09-30",
+      "digit1": 3,
+      "digit2": 9,
+      "digit3": 9
+    },
+    {
+      "period": "2025262",
+      "date": "2025-09-29",
+      "digit1": 9,
+      "digit2": 1,
+      "digit3": 4
+    },
+    {
+      "period": "2025261",
+      "date": "2025-09-28",
+      "digit1": 7,
+      "digit2": 5,
+      "digit3": 1
+    },
+    {
+      "period": "2025260",
+      "date": "2025-09-27",
+      "digit1": 1,
+      "digit2": 9,
+      "digit3": 9
+    },
+    {
+      "period": "2025259",
+      "date": "2025-09-26",
+      "digit1": 6,
+      "digit2": 2,
+      "digit3": 5
+    },
+    {
+      "period": "2025258",
+      "date": "2025-09-25",
+      "digit1": 6,
+      "digit2": 2,
+      "digit3": 6
+    },
+    {
+      "period": "2025257",
+      "date": "2025-09-24",
+      "digit1": 8,
+      "digit2": 6,
+      "digit3": 0
+    },
+    {
+      "period": "2025256",
+      "date": "2025-09-23",
+      "digit1": 4,
+      "digit2": 0,
+      "digit3": 6
+    },
+    {
+      "period": "2025255",
+      "date": "2025-09-22",
+      "digit1": 2,
+      "digit2": 6,
+      "digit3": 4
+    },
+    {
+      "period": "2025254",
+      "date": "2025-09-21",
+      "digit1": 0,
+      "digit2": 7,
+      "digit3": 2
+    },
+    {
+      "period": "2025253",
+      "date": "2025-09-20",
+      "digit1": 4,
+      "digit2": 5,
+      "digit3": 7
+    },
+    {
+      "period": "2025252",
+      "date": "2025-09-19",
+      "digit1": 7,
+      "digit2": 9,
+      "digit3": 2
+    },
+    {
+      "period": "2025251",
+      "date": "2025-09-18",
+      "digit1": 8,
+      "digit2": 6,
+      "digit3": 8
+    },
+    {
+      "period": "2025250",
+      "date": "2025-09-17",
+      "digit1": 9,
+      "digit2": 0,
+      "digit3": 2
+    },
+    {
+      "period": "2025249",
+      "date": "2025-09-16",
+      "digit1": 9,
+      "digit2": 5,
+      "digit3": 2
+    },
+    {
+      "period": "2025248",
+      "date": "2025-09-15",
+      "digit1": 5,
+      "digit2": 2,
+      "digit3": 6
+    },
+    {
+      "period": "2025247",
+      "date": "2025-09-14",
+      "digit1": 2,
+      "digit2": 6,
+      "digit3": 2
+    },
+    {
+      "period": "2025246",
+      "date": "2025-09-13",
+      "digit1": 9,
+      "digit2": 9,
+      "digit3": 7
+    },
+    {
+      "period": "2025245",
+      "date": "2025-09-12",
+      "digit1": 8,
+      "digit2": 4,
+      "digit3": 8
+    },
+    {
+      "period": "2025244",
+      "date": "2025-09-11",
+      "digit1": 6,
+      "digit2": 7,
+      "digit3": 3
+    },
+    {
+      "period": "2025243",
+      "date": "2025-09-10",
+      "digit1": 1,
+      "digit2": 7,
+      "digit3": 6
+    },
+    {
+      "period": "2025242",
+      "date": "2025-09-09",
+      "digit1": 9,
+      "digit2": 9,
+      "digit3": 0
+    },
+    {
+      "period": "2025241",
+      "date": "2025-09-08",
+      "digit1": 1,
+      "digit2": 6,
+      "digit3": 0
+    },
+    {
+      "period": "2025240",
+      "date": "2025-09-07",
+      "digit1": 4,
+      "digit2": 1,
+      "digit3": 9
+    },
+    {
+      "period": "2025239",
+      "date": "2025-09-06",
+      "digit1": 1,
+      "digit2": 2,
+      "digit3": 5
+    },
+    {
+      "period": "2025238",
+      "date": "2025-09-05",
+      "digit1": 8,
+      "digit2": 6,
+      "digit3": 0
+    },
+    {
+      "period": "2025237",
+      "date": "2025-09-04",
+      "digit1": 5,
+      "digit2": 9,
+      "digit3": 0
+    },
+    {
+      "period": "2025236",
+      "date": "2025-09-03",
+      "digit1": 3,
+      "digit2": 5,
+      "digit3": 5
+    },
+    {
+      "period": "2025235",
+      "date": "2025-09-02",
+      "digit1": 9,
+      "digit2": 6,
+      "digit3": 9
+    },
+    {
+      "period": "2025234",
+      "date": "2025-09-01",
+      "digit1": 6,
+      "digit2": 2,
+      "digit3": 0
+    },
+    {
+      "period": "2025233",
+      "date": "2025-08-31",
+      "digit1": 2,
+      "digit2": 5,
+      "digit3": 9
+    },
+    {
+      "period": "2025232",
+      "date": "2025-08-30",
+      "digit1": 0,
+      "digit2": 4,
+      "digit3": 4
+    },
+    {
+      "period": "2025231",
+      "date": "2025-08-29",
+      "digit1": 7,
+      "digit2": 3,
+      "digit3": 2
+    },
+    {
+      "period": "2025230",
+      "date": "2025-08-28",
+      "digit1": 4,
+      "digit2": 3,
+      "digit3": 9
+    },
+    {
+      "period": "2025229",
+      "date": "2025-08-27",
+      "digit1": 1,
+      "digit2": 0,
+      "digit3": 8
+    },
+    {
+      "period": "2025228",
+      "date": "2025-08-26",
+      "digit1": 4,
+      "digit2": 6,
+      "digit3": 5
+    },
+    {
+      "period": "2025227",
+      "date": "2025-08-25",
+      "digit1": 6,
+      "digit2": 1,
+      "digit3": 1
+    },
+    {
+      "period": "2025226",
+      "date": "2025-08-24",
+      "digit1": 1,
+      "digit2": 8,
+      "digit3": 0
+    },
+    {
+      "period": "2025225",
+      "date": "2025-08-23",
+      "digit1": 8,
+      "digit2": 0,
+      "digit3": 6
+    },
+    {
+      "period": "2025224",
+      "date": "2025-08-22",
+      "digit1": 9,
+      "digit2": 9,
+      "digit3": 0
+    },
+    {
+      "period": "2025223",
+      "date": "2025-08-21",
+      "digit1": 7,
+      "digit2": 3,
+      "digit3": 6
+    },
+    {
+      "period": "2025222",
+      "date": "2025-08-20",
+      "digit1": 0,
+      "digit2": 1,
+      "digit3": 0
+    },
+    {
+      "period": "2025221",
+      "date": "2025-08-19",
+      "digit1": 2,
+      "digit2": 9,
+      "digit3": 6
+    },
+    {
+      "period": "2025220",
+      "date": "2025-08-18",
+      "digit1": 5,
+      "digit2": 3,
+      "digit3": 6
+    },
+    {
+      "period": "2025219",
+      "date": "2025-08-17",
+      "digit1": 9,
+      "digit2": 0,
+      "digit3": 0
+    },
+    {
+      "period": "2025218",
+      "date": "2025-08-16",
+      "digit1": 5,
+      "digit2": 2,
+      "digit3": 6
+    },
+    {
+      "period": "2025217",
+      "date": "2025-08-15",
+      "digit1": 8,
+      "digit2": 9,
+      "digit3": 4
+    },
+    {
+      "period": "2025216",
+      "date": "2025-08-14",
+      "digit1": 6,
+      "digit2": 2,
+      "digit3": 5
+    },
+    {
+      "period": "2025215",
+      "date": "2025-08-13",
+      "digit1": 8,
+      "digit2": 5,
+      "digit3": 3
+    },
+    {
+      "period": "2025214",
+      "date": "2025-08-12",
+      "digit1": 9,
+      "digit2": 2,
+      "digit3": 0
+    },
+    {
+      "period": "2025213",
+      "date": "2025-08-11",
+      "digit1": 3,
+      "digit2": 8,
+      "digit3": 1
+    },
+    {
+      "period": "2025212",
+      "date": "2025-08-10",
+      "digit1": 4,
+      "digit2": 5,
+      "digit3": 6
+    },
+    {
+      "period": "2025211",
+      "date": "2025-08-09",
+      "digit1": 8,
+      "digit2": 9,
+      "digit3": 7
+    },
+    {
+      "period": "2025210",
+      "date": "2025-08-08",
+      "digit1": 5,
+      "digit2": 2,
+      "digit3": 0
+    },
+    {
+      "period": "2025209",
+      "date": "2025-08-07",
+      "digit1": 3,
+      "digit2": 8,
+      "digit3": 7
+    },
+    {
+      "period": "2025208",
+      "date": "2025-08-06",
+      "digit1": 4,
+      "digit2": 3,
+      "digit3": 2
+    },
+    {
+      "period": "2025207",
+      "date": "2025-08-05",
+      "digit1": 2,
+      "digit2": 5,
+      "digit3": 5
+    },
+    {
+      "period": "2025206",
+      "date": "2025-08-04",
+      "digit1": 4,
+      "digit2": 4,
+      "digit3": 4
+    },
+    {
+      "period": "2025205",
+      "date": "2025-08-03",
+      "digit1": 9,
+      "digit2": 2,
+      "digit3": 0
+    },
+    {
+      "period": "2025204",
+      "date": "2025-08-02",
+      "digit1": 0,
+      "digit2": 0,
+      "digit3": 7
+    },
+    {
+      "period": "2025203",
+      "date": "2025-08-01",
+      "digit1": 0,
+      "digit2": 1,
+      "digit3": 3
+    },
+    {
+      "period": "2025202",
+      "date": "2025-07-31",
+      "digit1": 9,
+      "digit2": 5,
+      "digit3": 3
+    },
+    {
+      "period": "2025201",
+      "date": "2025-07-30",
+      "digit1": 8,
+      "digit2": 4,
+      "digit3": 6
+    },
+    {
+      "period": "2025200",
+      "date": "2025-07-29",
+      "digit1": 0,
+      "digit2": 1,
+      "digit3": 5
+    },
+    {
+      "period": "2025199",
+      "date": "2025-07-28",
+      "digit1": 9,
+      "digit2": 4,
+      "digit3": 3
+    },
+    {
+      "period": "2025198",
+      "date": "2025-07-27",
+      "digit1": 8,
+      "digit2": 9,
+      "digit3": 8
+    },
+    {
+      "period": "2025197",
+      "date": "2025-07-26",
+      "digit1": 0,
+      "digit2": 5,
+      "digit3": 7
+    },
+    {
+      "period": "2025196",
+      "date": "2025-07-25",
+      "digit1": 7,
+      "digit2": 3,
+      "digit3": 4
+    }
+  ]
+}

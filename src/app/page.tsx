@@ -1,101 +1,103 @@
-import Image from "next/image";
+import Navbar from '@/components/layout/Navbar';
+import MobileTabBar from '@/components/layout/MobileTabBar';
+import Footer from '@/components/layout/Footer';
+import Disclaimer from '@/components/layout/Disclaimer';
+import HeroSection from '@/components/home/HeroSection';
+import DataTicker from '@/components/home/DataTicker';
+import FeatureCards from '@/components/home/FeatureCards';
+import AIDemo from '@/components/home/AIDemo';
+import StatsOverview from '@/components/home/StatsOverview';
+import Link from 'next/link';
+import { mockDraws } from '@/lib/mock/fc3d-draws';
+import { TREND_NAV_ITEMS } from '@/lib/constants';
+import FC3DBall from '@/components/lottery/FC3DBall';
+import { formatPeriod } from '@/utils/format';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const recentDraws = mockDraws.slice(1, 6);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (
+    <div className="min-h-screen pb-[70px] lg:pb-0">
+      <Navbar />
+      <HeroSection />
+      <DataTicker />
+      <FeatureCards />
+
+      {/* Two Column: Recent Draws + Trend Nav */}
+      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+          {/* Recent Draws */}
+          <div className="mb-6 lg:mb-0">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-white">近期开奖</h2>
+              <Link href="/data" className="text-xs text-gray-500 hover:text-[#7434f3] transition-colors">
+                更多 ›
+              </Link>
+            </div>
+            <div className="bg-[#13161b] border border-white/5 rounded-2xl overflow-hidden">
+              {recentDraws.map(draw => (
+                <div
+                  key={draw.period}
+                  className="flex items-center justify-between px-4 py-3 border-b border-white/5 last:border-b-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500 w-20">{formatPeriod(draw.period)}</span>
+                    <div className="flex gap-1.5">
+                      <FC3DBall digit={draw.digit1} size="sm" />
+                      <FC3DBall digit={draw.digit2} size="sm" />
+                      <FC3DBall digit={draw.digit3} size="sm" />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 text-xs text-gray-500">
+                    <span>和值<strong className="text-[#00d4aa] ml-0.5">{draw.sum}</strong></span>
+                    <span>跨度<strong className="text-[#00d4aa] ml-0.5">{draw.span}</strong></span>
+                    <span className="hidden sm:inline">{draw.bigSmallPattern}</span>
+                    <span className="hidden sm:inline">{draw.oddEvenPattern}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trend Navigation */}
+          <div className="mb-6 lg:mb-0">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-white">走势分析</h2>
+              <Link href="/trend" className="text-xs text-gray-500 hover:text-[#7434f3] transition-colors">
+                全部图表 ›
+              </Link>
+            </div>
+            <div className="bg-[#13161b] border border-white/5 rounded-2xl p-4">
+              <div className="space-y-4">
+                {TREND_NAV_ITEMS.map(group => (
+                  <div key={group.category}>
+                    <div className="text-[11px] text-gray-500 font-semibold mb-2 uppercase tracking-wider">
+                      {group.category}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {group.items.map(item => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="px-3 py-1.5 bg-white/5 hover:bg-[#7434f3]/10 hover:text-[#7434f3] rounded-lg text-xs text-gray-400 transition-colors"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      <AIDemo />
+      <StatsOverview />
+      <Disclaimer />
+      <Footer />
+      <MobileTabBar />
     </div>
   );
 }
