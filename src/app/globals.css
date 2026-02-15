@@ -10,31 +10,31 @@
 
 @layer base {
   :root {
-    --background: 216 21% 4%;
-    --foreground: 210 40% 96%;
-    --card: 216 17% 9%;
-    --card-foreground: 210 40% 96%;
-    --popover: 216 15% 12%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 263 89% 58%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
+    --primary: 211 100% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 100% / 0.05;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 0 0% 100% / 0.05;
-    --muted-foreground: 217 10% 64%;
-    --accent: 167 100% 42%;
+    --secondary: 240 6% 97%;
+    --secondary-foreground: 0 0% 11%;
+    --muted: 240 6% 97%;
+    --muted-foreground: 0 0% 44%;
+    --accent: 211 100% 45%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 4 77% 56%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 263 89% 58%;
-    --chart-1: 263 89% 58%;
-    --chart-2: 167 100% 42%;
-    --chart-3: 29 80% 52%;
-    --chart-4: 204 70% 53%;
-    --chart-5: 4 77% 56%;
-    --radius: 0.75rem;
+    --border: 240 6% 93%;
+    --input: 240 6% 93%;
+    --ring: 211 100% 45%;
+    --chart-1: 211 100% 45%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 258 90% 66%;
+    --chart-5: 0 84% 60%;
+    --radius: 1rem;
   }
 }
 
@@ -44,11 +44,25 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* FC3D Ball styles */
+/* Glass morphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Apple section spacing */
+.section-apple {
+  @apply py-16 lg:py-24;
+}
+
+/* FC3D Ball styles — domain colors preserved */
 .ball {
   @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0;
 }
@@ -61,16 +75,14 @@
   @apply w-7 h-7 text-xs;
 }
 
-.ball-red,
-.ball-purple {
-  background: linear-gradient(135deg, #7434f3, #9b59b6);
-  box-shadow: 0 2px 6px rgba(116, 52, 243, 0.3);
+.ball-red {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
 }
 
-.ball-orange,
-.ball-neon {
-  background: linear-gradient(135deg, #00d4aa, #00b894);
-  box-shadow: 0 2px 6px rgba(0, 212, 170, 0.3);
+.ball-blue {
+  background: linear-gradient(135deg, #2980b9, #1a6da3);
+  box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3);
 }
 
 /* Hide scrollbar utility */
@@ -82,68 +94,50 @@
   scrollbar-width: none;
 }
 
-/* Trend Table styles - Dark theme */
+/* Trend Table styles — Apple refined */
 .trend-table {
   @apply w-full border-collapse text-xs;
 }
 .trend-table th {
-  @apply sticky top-0 border px-1 py-2 text-center font-semibold text-gray-400 z-10;
-  background-color: #1a1d23;
-  border-color: rgba(255, 255, 255, 0.05);
+  @apply sticky top-0 border px-1 py-2 text-center font-semibold text-[#6e6e73] z-10;
+  background-color: #f5f5f7;
+  border-color: #ebebed;
   min-width: 32px;
 }
 .trend-table td {
   @apply px-0.5 py-1 text-center;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #ebebed;
   min-width: 32px;
   height: 32px;
 }
 .trend-table .period-col {
-  @apply sticky left-0 z-20 font-medium text-gray-300 text-[11px];
-  background-color: #13161b;
+  @apply sticky left-0 z-20 font-medium text-[#1d1d1f] text-[11px];
+  background-color: #ffffff;
   min-width: 52px;
 }
 .trend-table thead th.period-col {
   @apply z-30;
-  background-color: #1a1d23;
+  background-color: #f5f5f7;
 }
 .trend-table .position-header {
   @apply font-bold text-[11px];
-  background-color: rgba(116, 52, 243, 0.1);
-  color: #7434f3;
+  background-color: rgba(0, 113, 227, 0.06);
+  color: #0071e3;
 }
 .trend-table .extra-col {
-  @apply text-gray-400 font-semibold text-[11px];
-  background-color: #1a1d23;
+  @apply text-[#6e6e73] font-semibold text-[11px];
+  background-color: #f5f5f7;
   min-width: 40px;
 }
 .trend-table .extra-col-value {
   @apply text-[11px] font-semibold;
-  color: #00d4aa;
-  background-color: rgba(0, 212, 170, 0.05);
+  color: #0071e3;
+  background-color: rgba(0, 113, 227, 0.03);
 }
 .trend-stats-row td {
-  @apply font-semibold text-gray-400;
-  background-color: #1a1d23;
+  @apply font-semibold text-[#6e6e73];
+  background-color: #f5f5f7;
 }
 .trend-table tbody tr:nth-child(5n) {
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Glass card utility */
-.glass-card {
-  background: rgba(19, 22, 27, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 1rem;
-}
-
-/* Glow utilities */
-.glow-purple {
-  box-shadow: 0 0 20px rgba(116, 52, 243, 0.2);
-}
-
-.neon-text {
-  text-shadow: 0 0 10px rgba(116, 52, 243, 0.5), 0 0 20px rgba(116, 52, 243, 0.3);
+  border-bottom: 2px solid #d1d5db;
 }

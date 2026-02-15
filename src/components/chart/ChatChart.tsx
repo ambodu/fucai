@@ -58,12 +58,12 @@ function buildOption(chart: ChartData): echarts.EChartsCoreOption {
           avoidLabelOverlap: true,
           itemStyle: {
             borderRadius: 6,
-            borderColor: '#13161b',
+            borderColor: '#ffffff',
             borderWidth: 2,
           },
           label: {
             show: true,
-            color: '#9ca3af',
+            color: '#6e6e73',
             fontSize: 11,
           },
           data: xAxis
@@ -99,10 +99,10 @@ function buildOption(chart: ChartData): echarts.EChartsCoreOption {
       radar: {
         indicator: (xAxis || []).map(name => ({ name, max: Math.ceil(maxVal * 1.2) })),
         shape: 'polygon',
-        axisName: { color: '#9ca3af', fontSize: 11 },
-        splitArea: { areaStyle: { color: ['rgba(116,52,243,0.02)', 'rgba(116,52,243,0.05)'] } },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
+        axisName: { color: '#6e6e73', fontSize: 11 },
+        splitArea: { areaStyle: { color: ['rgba(0,113,227,0.02)', 'rgba(0,113,227,0.04)'] } },
+        splitLine: { lineStyle: { color: '#ebebed' } },
+        axisLine: { lineStyle: { color: '#ebebed' } },
       },
       series: [
         {
@@ -196,11 +196,11 @@ export default function ChatChart({ chart }: ChatChartProps) {
   return (
     <div className="mt-3">
       {chart.title && (
-        <h5 className="text-xs font-semibold text-gray-300 mb-1.5">{chart.title}</h5>
+        <h5 className="text-xs font-semibold text-[#1d1d1f] mb-1.5">{chart.title}</h5>
       )}
       <div
         ref={chartRef}
-        className="w-full h-[260px] bg-[#0b0e11]/50 rounded-xl"
+        className="w-full h-[260px] bg-white shadow-apple-sm rounded-2xl p-3"
       />
     </div>
   );

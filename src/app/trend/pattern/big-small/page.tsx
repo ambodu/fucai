@@ -27,10 +27,10 @@ export default function BigSmallPatternPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">大小形态走势</h2>
+        <h2 className="text-lg font-bold text-[#1d1d1f]">大小形态走势</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
-      <div className="text-xs text-gray-500">规则：0-4为小，5-9为大</div>
+      <div className="text-xs text-[#6e6e73]">规则：0-4为小，5-9为大</div>
       <TrendTable
         periods={periods}
         cellData={cellData}

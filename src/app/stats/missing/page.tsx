@@ -69,7 +69,7 @@ export default function MissingStatsPage() {
 
   const SortHeader = ({ field, label }: { field: keyof MissingRow; label: string }) => (
     <th
-      className="px-3 py-2 text-left text-xs font-semibold text-gray-500 cursor-pointer hover:bg-white/5 select-none"
+      className="px-3 py-2 text-left text-xs font-semibold text-[#6e6e73] cursor-pointer hover:bg-[#f5f5f7] select-none"
       onClick={() => handleSort(field)}
     >
       {label}
@@ -81,13 +81,13 @@ export default function MissingStatsPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-white">遗漏统计</h2>
-      <p className="text-xs text-gray-500">点击表头可排序，查看各位置各数字的遗漏情况</p>
+      <h2 className="text-lg font-bold text-[#1d1d1f]">遗漏统计</h2>
+      <p className="text-xs text-[#6e6e73]">点击表头可排序，查看各位置各数字的遗漏情况</p>
 
-      <div className="bg-[#13161b] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-apple overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-white/5 border-b border-white/5">
+            <thead className="bg-[#f5f5f7] border-b border-[#ebebed]">
               <tr>
                 <SortHeader field="position" label="位置" />
                 <SortHeader field="digit" label="数字" />
@@ -103,24 +103,24 @@ export default function MissingStatsPage() {
               {sortedRows.map((row) => (
                 <tr
                   key={`${row.position}-${row.digit}`}
-                  className="border-b border-white/5 hover:bg-white/5"
+                  className="border-b border-[#f5f5f7] hover:bg-[#f5f5f7]/50"
                 >
-                  <td className="px-3 py-2 font-medium text-gray-300">{row.positionLabel}</td>
+                  <td className="px-3 py-2 font-medium text-[#1d1d1f]">{row.positionLabel}</td>
                   <td className="px-3 py-2">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#7434f3] text-white text-[11px] font-bold">
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071e3] text-white text-[11px] font-bold">
                       {row.digit}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-gray-300">
-                    <span className={row.currentMissing >= 15 ? 'text-[#e74c3c] font-bold' : row.currentMissing >= 10 ? 'text-[#e67e22] font-semibold' : ''}>
+                  <td className="px-3 py-2 text-[#1d1d1f]">
+                    <span className={row.currentMissing >= 15 ? 'text-[#ef4444] font-bold' : row.currentMissing >= 10 ? 'text-[#e67e22] font-semibold' : ''}>
                       {row.currentMissing}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-gray-400">{row.maxMissing}</td>
-                  <td className="px-3 py-2 text-gray-400">{row.avgMissing}</td>
-                  <td className="px-3 py-2 text-gray-400">{row.count30}</td>
-                  <td className="px-3 py-2 text-gray-400">{row.count50}</td>
-                  <td className="px-3 py-2 text-gray-400">{row.count100}</td>
+                  <td className="px-3 py-2 text-[#6e6e73]">{row.maxMissing}</td>
+                  <td className="px-3 py-2 text-[#6e6e73]">{row.avgMissing}</td>
+                  <td className="px-3 py-2 text-[#6e6e73]">{row.count30}</td>
+                  <td className="px-3 py-2 text-[#6e6e73]">{row.count50}</td>
+                  <td className="px-3 py-2 text-[#6e6e73]">{row.count100}</td>
                 </tr>
               ))}
             </tbody>

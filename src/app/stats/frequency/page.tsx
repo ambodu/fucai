@@ -54,33 +54,33 @@ export default function FrequencyPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <BarChart3 size={20} className="text-[#7434f3]" />
+        <BarChart3 size={20} className="text-[#0071e3]" />
         <div>
-          <h2 className="text-lg font-semibold text-white">号码频率统计</h2>
-          <p className="text-xs text-gray-500 mt-0.5">近50期各位置数字出现频率分析</p>
+          <h2 className="text-lg font-semibold text-[#1d1d1f]">号码频率统计</h2>
+          <p className="text-xs text-[#6e6e73] mt-0.5">近50期各位置数字出现频率分析</p>
         </div>
       </div>
 
       {/* Total frequency */}
-      <div className="bg-[#13161b] border border-white/5 rounded-2xl p-5">
-        <h3 className="text-sm font-semibold mb-4 text-white">综合频率（全部位置）</h3>
+      <div className="bg-white rounded-2xl shadow-apple p-5">
+        <h3 className="text-sm font-semibold mb-4 text-[#1d1d1f]">综合频率（全部位置）</h3>
         <div className="space-y-2.5">
           {totalStats.map(item => (
             <div key={item.digit} className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7434f3] to-[#9b59b6] text-white text-sm font-bold flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0071e3] to-[#0077ed] text-white text-sm font-bold flex items-center justify-center shrink-0">
                 {item.digit}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="h-6 bg-white/5 rounded-lg overflow-hidden">
+                <div className="h-6 bg-[#f5f5f7] rounded-lg overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#7434f3] to-[#9b59b6] rounded-lg flex items-center px-2 transition-all"
+                    className="h-full bg-gradient-to-r from-[#0071e3] to-[#0077ed] rounded-lg flex items-center px-2 transition-all"
                     style={{ width: `${item.barWidth}%` }}
                   >
                     <span className="text-[11px] text-white font-medium whitespace-nowrap">{item.count}次</span>
                   </div>
                 </div>
               </div>
-              <span className="text-xs text-gray-500 w-12 text-right shrink-0">{item.pct}%</span>
+              <span className="text-xs text-[#6e6e73] w-12 text-right shrink-0">{item.pct}%</span>
             </div>
           ))}
         </div>
@@ -89,23 +89,23 @@ export default function FrequencyPage() {
       {/* Per-position frequency */}
       <div className="grid gap-4 lg:grid-cols-3">
         {stats.map(pos => (
-          <div key={pos.label} className="bg-[#13161b] border border-white/5 rounded-2xl p-5">
-            <h3 className="text-sm font-semibold mb-4 text-[#7434f3]">{pos.label}频率</h3>
+          <div key={pos.label} className="bg-white rounded-2xl shadow-apple p-5">
+            <h3 className="text-sm font-semibold mb-4 text-[#0071e3]">{pos.label}频率</h3>
             <div className="space-y-2">
               {pos.data.sort((a, b) => b.count - a.count).map(item => (
                 <div key={item.digit} className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-md bg-white/10 text-gray-300 text-xs font-bold flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-md bg-[#f5f5f7] text-[#1d1d1f] text-xs font-bold flex items-center justify-center shrink-0">
                     {item.digit}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className="h-5 bg-white/5 rounded overflow-hidden">
+                    <div className="h-5 bg-[#f5f5f7] rounded overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#7434f3] to-[#00d4aa] rounded transition-all"
+                        className="h-full bg-gradient-to-r from-[#0071e3] to-[#06b6d4] rounded transition-all"
                         style={{ width: `${item.barWidth}%` }}
                       />
                     </div>
                   </div>
-                  <span className="text-[11px] text-gray-500 w-16 text-right shrink-0">
+                  <span className="text-[11px] text-[#6e6e73] w-16 text-right shrink-0">
                     {item.count}次 ({item.pct}%)
                   </span>
                 </div>

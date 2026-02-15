@@ -1,144 +1,52 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import * as echarts from 'echarts/core';
-import { BarChart, LineChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
-import { TrendingUp, Flame, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { Hash, TrendingUp, Flame, Target } from 'lucide-react';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
 
-echarts.use([BarChart, LineChart, GridComponent, TooltipComponent, CanvasRenderer]);
-
-function MiniChart({ type, data, color }: { type: 'bar' | 'line'; data: number[]; color: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const chart = echarts.init(ref.current);
-    const option = type === 'bar'
-      ? {
-          backgroundColor: 'transparent',
-          grid: { top: 5, right: 5, bottom: 5, left: 5 },
-          xAxis: { type: 'category', show: false },
-          yAxis: { type: 'value', show: false },
-          series: [{
-            type: 'bar',
-            data,
-            itemStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color },
-                { offset: 1, color: `${color}40` },
-              ]),
-              borderRadius: [2, 2, 0, 0],
-            },
-            barWidth: '60%',
-          }],
-        }
-      : {
-          backgroundColor: 'transparent',
-          grid: { top: 5, right: 5, bottom: 5, left: 5 },
-          xAxis: { type: 'category', show: false },
-          yAxis: { type: 'value', show: false },
-          series: [{
-            type: 'line',
-            data,
-            smooth: true,
-            symbol: 'none',
-            lineStyle: { color, width: 2 },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: `${color}30` },
-                { offset: 1, color: `${color}05` },
-              ]),
-            },
-          }],
-        };
-
-    chart.setOption(option);
-    const handleResize = () => chart.resize();
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.dispose();
-    };
-  }, [type, data, color]);
-
-  return <div ref={ref} className="w-full h-[80px]" />;
-}
-
 export default function FeatureCards() {
-  const recent20 = mockDraws.slice(0, 20);
+  const recent50 = mockDraws.slice(0, 50);
+  const totalPeriods = mockDraws.length;
 
-  // Feature 1: AI prediction — frequency bar data
-  const freqData: number[] = [];
-  for (let d = 0; d <= 9; d++) {
-    freqData.push(
-      recent20.filter(draw => draw.digit1 === d || draw.digit2 === d || draw.digit3 === d).length
-    );
-  }
+  const avgSum = (recent50.reduce((a, d) => a + d.sum, 0) / recent50.length).toFixed(1);
 
-  // Feature 2: Trend — sum values line
-  const sumData = recent20.map(d => d.sum).reverse();
+  const pairCount = recent50.filter(d => d.group === 'pair').length;
+  const pairRatio = ((pairCount / recent50.length) * 100).toFixed(0);
 
-  // Feature 3: Hot/cold — missing counts bar
-  const missingData: number[] = [];
+  let maxMissing = 0;
+  let maxMissingDigit = 0;
   for (let d = 0; d <= 9; d++) {
     const idx = mockDraws.findIndex(draw => draw.digit1 === d || draw.digit2 === d || draw.digit3 === d);
-    missingData.push(idx === -1 ? 30 : idx);
+    const m = idx === -1 ? mockDraws.length : idx;
+    if (m > maxMissing) {
+      maxMissing = m;
+      maxMissingDigit = d;
+    }
   }
 
-  const features = [
-    {
-      icon: Sparkles,
-      title: 'AI 智能预测',
-      desc: '基于多维度数据分析，AI 给出号码参考建议',
-      href: '/ai',
-      chartType: 'bar' as const,
-      chartData: freqData,
-      chartColor: '#7434f3',
-    },
-    {
-      icon: TrendingUp,
-      title: '数据走势分析',
-      desc: '和值、跨度、形态等多维走势图表',
-      href: '/trend',
-      chartType: 'line' as const,
-      chartData: sumData,
-      chartColor: '#00d4aa',
-    },
-    {
-      icon: Flame,
-      title: '冷热号码追踪',
-      desc: '实时追踪号码冷热状态与遗漏周期',
-      href: '/stats/hot-cold',
-      chartType: 'bar' as const,
-      chartData: missingData,
-      chartColor: '#e67e22',
-    },
+  const stats = [
+    { label: '总期数', value: totalPeriods.toLocaleString(), icon: Hash, sub: undefined as string | undefined },
+    { label: '平均和值', value: avgSum, icon: TrendingUp, sub: '近50期' },
+    { label: '对子比例', value: `${pairRatio}%`, icon: Flame, sub: '近50期' },
+    { label: '最大遗漏', value: String(maxMissing), icon: Target, sub: `号码${maxMissingDigit}` },
   ];
 
   return (
-    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {features.map(f => (
-          <Link
-            key={f.title}
-            href={f.href}
-            className="group bg-[#13161b] border border-white/5 rounded-2xl p-5 hover:border-[#7434f3]/30 transition-all"
+    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 pb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {stats.map(s => (
+          <div
+            key={s.label}
+            className="bg-white shadow-apple rounded-2xl p-4 hover:shadow-apple-lg transition-all"
           >
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-[#7434f3]/10 flex items-center justify-center">
-                <f.icon size={18} className="text-[#7434f3]" />
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#0071e3]/8">
+                <s.icon size={16} className="text-[#0071e3]" />
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">{f.title}</h3>
-                <p className="text-[11px] text-gray-500">{f.desc}</p>
-              </div>
+              <span className="text-xs text-[#6e6e73]">{s.label}</span>
             </div>
-            <MiniChart type={f.chartType} data={f.chartData} color={f.chartColor} />
-          </Link>
+            <div className="text-2xl font-bold text-[#1d1d1f]">{s.value}</div>
+            {s.sub && <div className="text-[11px] text-[#6e6e73] mt-0.5">{s.sub}</div>}
+          </div>
         ))}
       </div>
     </section>

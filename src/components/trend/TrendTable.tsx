@@ -22,7 +22,7 @@ interface TrendTableProps {
   showStats?: boolean;
 }
 
-const GROUP_LINE_COLORS = ['#7434f3', '#00d4aa', '#3498db', '#e67e22'];
+const GROUP_LINE_COLORS = ['#e74c3c', '#2980b9', '#27ae60', '#e67e22'];
 
 export default function TrendTable({
   periods,
@@ -57,16 +57,16 @@ export default function TrendTable({
   }, [columnGroups, hasGroups]);
 
   return (
-    <div className="bg-[#13161b] rounded-2xl overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-apple overflow-hidden">
       {title && (
-        <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-gray-200">{title}</h3>
-          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-500 hover:text-gray-300 transition-colors">
+        <div className="px-4 py-3 border-b border-[#ebebed] flex items-center justify-between">
+          <h3 className="text-sm font-bold text-[#1d1d1f]">{title}</h3>
+          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
             <input
               type="checkbox"
               checked={showLines}
               onChange={e => setShowLines(e.target.checked)}
-              className="w-3.5 h-3.5 rounded accent-[#7434f3]"
+              className="w-3.5 h-3.5 rounded accent-[#0071e3]"
             />
             显示连线
           </label>

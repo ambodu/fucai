@@ -10,14 +10,11 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-[#0b0e11]/95 backdrop-blur-md border-b border-white/5 sticky top-0 z-50 hidden lg:block">
-      <div className="max-w-[1200px] mx-auto flex items-center justify-between h-14 px-6">
+    <nav className="glass border-b border-[#ebebed] sticky top-0 z-50 hidden lg:block">
+      <div className="max-w-[1200px] mx-auto flex items-center justify-between h-12 px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7434f3] to-[#9b59b6] flex items-center justify-center text-white text-sm font-bold">
-            彩
-          </div>
-          <span className="text-lg font-semibold text-white">{APP_NAME}</span>
+        <Link href="/" className="flex items-center gap-1.5">
+          <span className="text-lg font-semibold text-[#1d1d1f]">{APP_NAME}</span>
         </Link>
 
         {/* Nav Links */}
@@ -30,10 +27,10 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'px-4 py-2 rounded-xl text-sm transition-colors',
+                  'px-3.5 py-1.5 rounded-full text-sm transition-colors',
                   isActive
-                    ? 'bg-[#7434f3]/10 text-[#7434f3] font-medium'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#0071e3]/8 text-[#0071e3] font-medium'
+                    : 'text-[#6e6e73] hover:text-[#1d1d1f]'
                 )}
               >
                 {item.label}
@@ -45,10 +42,10 @@ export default function Navbar() {
         {/* CTA Button */}
         <Link
           href="/ai"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#7434f3] to-[#9b59b6] text-white text-sm font-medium hover:opacity-90 transition-opacity"
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0071e3] text-white text-sm font-medium hover:bg-[#0077ed] transition-colors"
         >
-          <Sparkles size={14} />
-          开始分析
+          <Sparkles size={13} />
+          AI 分析
         </Link>
       </div>
     </nav>

@@ -1,32 +1,34 @@
-// ECharts dark theme constants for Kraken-style dark UI
+// ECharts Apple-style theme constants
 
 export const CHART_COLORS = [
-  '#7434f3',  // purple - primary
-  '#00d4aa',  // neon green
-  '#e67e22',  // orange
-  '#3498db',  // blue
-  '#e74c3c',  // red
-  '#9b59b6',  // light purple
-  '#00d4ff',  // cyan
-  '#f1c40f',  // yellow
+  '#0071e3',  // Apple Blue — primary
+  '#10b981',  // Emerald
+  '#f59e0b',  // Amber
+  '#8b5cf6',  // Violet
+  '#ef4444',  // Red
+  '#06b6d4',  // Cyan
+  '#ec4899',  // Pink
+  '#6366f1',  // Indigo
 ] as const;
 
 export const CHART_THEME = {
   backgroundColor: 'transparent',
   textStyle: {
-    color: '#9ca3af',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif',
+    color: '#6e6e73',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif',
   },
   title: {
-    textStyle: { color: '#f1f5f9', fontSize: 14, fontWeight: 600 },
+    textStyle: { color: '#1d1d1f', fontSize: 14, fontWeight: 600 },
   },
   tooltip: {
-    backgroundColor: '#1a1d23',
-    borderColor: 'rgba(255,255,255,0.1)',
-    textStyle: { color: '#f1f5f9', fontSize: 12 },
+    backgroundColor: '#ffffff',
+    borderColor: '#ebebed',
+    borderRadius: 12,
+    textStyle: { color: '#1d1d1f', fontSize: 12 },
+    extraCssText: 'box-shadow: 0 4px 24px rgba(0,0,0,0.08);',
   },
   legend: {
-    textStyle: { color: '#9ca3af', fontSize: 11 },
+    textStyle: { color: '#6e6e73', fontSize: 11 },
   },
   grid: {
     top: 40,
@@ -35,15 +37,15 @@ export const CHART_THEME = {
     left: 45,
   },
   xAxis: {
-    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-    axisTick: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-    axisLabel: { color: '#9ca3af', fontSize: 11 },
-    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+    axisLine: { lineStyle: { color: '#ebebed' } },
+    axisTick: { lineStyle: { color: '#ebebed' } },
+    axisLabel: { color: '#6e6e73', fontSize: 11 },
+    splitLine: { lineStyle: { color: '#f5f5f7' } },
   },
   yAxis: {
-    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-    axisTick: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-    axisLabel: { color: '#9ca3af', fontSize: 11 },
-    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+    axisLine: { lineStyle: { color: '#ebebed' } },
+    axisTick: { lineStyle: { color: '#ebebed' } },
+    axisLabel: { color: '#6e6e73', fontSize: 11 },
+    splitLine: { lineStyle: { color: '#f5f5f7' } },
   },
 } as const;

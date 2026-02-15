@@ -56,7 +56,7 @@ export function getHeatLevel(missing: number): number {
 
 export function getHeatColor(missing: number): string {
   const level = getHeatLevel(missing);
-  const colors = ['#27ae60', '#2ecc71', '#f1c40f', '#e67e22', '#e74c3c', '#c0392b'];
+  const colors = ['#27ae60', '#2ecc71', '#f59e0b', '#e67e22', '#e74c3c', '#c0392b'];
   return colors[level];
 }
 

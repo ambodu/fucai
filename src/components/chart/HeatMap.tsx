@@ -24,7 +24,7 @@ export default function HeatMap({ statistics, position }: HeatMapProps) {
 
         return (
           <div key={pos}>
-            <h4 className="text-sm font-bold mb-3 text-gray-200">{getPositionLabel(pos)}遗漏热力图</h4>
+            <h4 className="text-sm font-bold mb-3 text-[#1d1d1f]">{getPositionLabel(pos)}遗漏热力图</h4>
             <div className="grid grid-cols-5 lg:grid-cols-10 gap-2">
               {posStats.map(stat => (
                 <div
@@ -45,12 +45,12 @@ export default function HeatMap({ statistics, position }: HeatMapProps) {
         {[
           { color: '#27ae60', label: '0-2期' },
           { color: '#2ecc71', label: '3-5期' },
-          { color: '#f1c40f', label: '6-10期' },
+          { color: '#f59e0b', label: '6-10期' },
           { color: '#e67e22', label: '11-15期' },
           { color: '#e74c3c', label: '16-20期' },
           { color: '#c0392b', label: '20期以上' },
         ].map(item => (
-          <div key={item.label} className="flex items-center gap-1.5 text-xs text-gray-400">
+          <div key={item.label} className="flex items-center gap-1.5 text-xs text-[#6e6e73]">
             <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
             {item.label}
           </div>

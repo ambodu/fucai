@@ -28,9 +28,9 @@ export default function SumSpanLine({ data, type }: SumSpanLineProps) {
       backgroundColor: 'transparent',
       tooltip: {
         trigger: 'axis',
-        backgroundColor: '#1a1d23',
-        borderColor: 'rgba(255,255,255,0.1)',
-        textStyle: { color: '#f1f5f9', fontSize: 12 },
+        backgroundColor: '#ffffff',
+        borderColor: '#ebebed',
+        textStyle: { color: '#1d1d1f', fontSize: 12 },
         formatter: (params: unknown) => {
           const p = (params as Array<{ name: string; value: number }>)[0];
           return `${p.name}期<br/>${type === 'sum' ? '和值' : '跨度'}: <b>${p.value}</b>`;
@@ -40,17 +40,17 @@ export default function SumSpanLine({ data, type }: SumSpanLineProps) {
       xAxis: {
         type: 'category',
         data: data.map(d => d.period.slice(-3)),
-        axisLabel: { fontSize: 10, rotate: 45, color: '#9ca3af' },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-        axisTick: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
+        axisLabel: { fontSize: 10, rotate: 45, color: '#6e6e73' },
+        axisLine: { lineStyle: { color: '#ebebed' } },
+        axisTick: { lineStyle: { color: '#ebebed' } },
       },
       yAxis: {
         type: 'value',
         min: 0,
         max: type === 'sum' ? 27 : 9,
-        axisLabel: { fontSize: 11, color: '#9ca3af' },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+        axisLabel: { fontSize: 11, color: '#6e6e73' },
+        axisLine: { lineStyle: { color: '#ebebed' } },
+        splitLine: { lineStyle: { color: '#f5f5f7' } },
       },
       series: [
         {
@@ -59,19 +59,19 @@ export default function SumSpanLine({ data, type }: SumSpanLineProps) {
           smooth: true,
           symbol: 'circle',
           symbolSize: 6,
-          lineStyle: { color: '#7434f3', width: 2 },
-          itemStyle: { color: '#7434f3' },
+          lineStyle: { color: '#0071e3', width: 2 },
+          itemStyle: { color: '#0071e3' },
           areaStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(116, 52, 243, 0.15)' },
-              { offset: 1, color: 'rgba(116, 52, 243, 0.01)' },
+              { offset: 0, color: 'rgba(0, 113, 227, 0.15)' },
+              { offset: 1, color: 'rgba(0, 113, 227, 0.01)' },
             ]),
           },
           markLine: {
             silent: true,
             data: [{ yAxis: avg, name: '平均' }],
-            lineStyle: { color: '#00d4aa', type: 'dashed' },
-            label: { formatter: `均值 ${avg.toFixed(1)}`, fontSize: 10, color: '#00d4aa' },
+            lineStyle: { color: '#8b5cf6', type: 'dashed' },
+            label: { formatter: `均值 ${avg.toFixed(1)}`, fontSize: 10, color: '#8b5cf6' },
           },
         },
       ],
@@ -88,7 +88,7 @@ export default function SumSpanLine({ data, type }: SumSpanLineProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-bold mb-2 text-gray-200">
+      <h4 className="text-sm font-bold mb-2 text-[#1d1d1f]">
         {type === 'sum' ? '和值' : '跨度'}走势
       </h4>
       <div ref={chartRef} className="w-full h-[250px] lg:h-[300px]" />

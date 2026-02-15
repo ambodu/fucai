@@ -27,9 +27,9 @@ export default function ComprehensivePage() {
   const columnLabels = [...digits, ...digits, ...digits];
 
   const columnGroups: ColumnGroup[] = [
-    { label: '百位', color: '#7434f3', columns: digits },
-    { label: '十位', color: '#00d4aa', columns: digits },
-    { label: '个位', color: '#3498db', columns: digits },
+    { label: '百位', color: '#0071e3', columns: digits },
+    { label: '十位', color: '#8b5cf6', columns: digits },
+    { label: '个位', color: '#10b981', columns: digits },
   ];
 
   const extraColumns = [
@@ -42,7 +42,7 @@ export default function ComprehensivePage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">综合分布图</h2>
+        <h2 className="text-lg font-bold text-[#1d1d1f]">综合分布图</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
       <TrendTable

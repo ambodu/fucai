@@ -9,20 +9,20 @@ interface DrawHistoryProps {
 
 export default function DrawHistory({ draws }: DrawHistoryProps) {
   return (
-    <div className="bg-[#13161b] border border-white/5 rounded-2xl overflow-hidden">
+    <div className="bg-white shadow-apple rounded-2xl overflow-hidden">
       {/* Mobile: Card list */}
       <div className="lg:hidden">
         {draws.map((draw) => (
-          <div key={draw.period} className="p-4 border-b border-white/5 last:border-b-0">
+          <div key={draw.period} className="p-4 border-b border-[#f5f5f7] last:border-b-0">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-white">{formatPeriod(draw.period)}</span>
-              <span className="text-xs text-gray-500">{formatDate(draw.drawDate)}</span>
+              <span className="text-sm font-semibold text-[#1d1d1f]">{formatPeriod(draw.period)}</span>
+              <span className="text-xs text-[#6e6e73]">{formatDate(draw.drawDate)}</span>
             </div>
             <div className="flex items-center gap-2 mb-2">
               <FC3DBall digit={draw.digit1} size="sm" />
               <FC3DBall digit={draw.digit2} size="sm" />
               <FC3DBall digit={draw.digit3} size="sm" />
-              <span className="text-xs text-gray-500 ml-2">
+              <span className="text-xs text-[#6e6e73] ml-2">
                 和值{draw.sum} · 跨度{draw.span} · {getGroupLabel(draw.group)}
               </span>
             </div>
@@ -34,22 +34,22 @@ export default function DrawHistory({ draws }: DrawHistoryProps) {
       <div className="hidden lg:block">
         <table className="w-full">
           <thead>
-            <tr className="bg-white/5">
-              <th className="px-4 py-3 text-left text-xs text-gray-500 font-semibold">期号</th>
-              <th className="px-4 py-3 text-left text-xs text-gray-500 font-semibold">日期</th>
-              <th className="px-4 py-3 text-left text-xs text-gray-500 font-semibold">开奖号码</th>
-              <th className="px-4 py-3 text-center text-xs text-gray-500 font-semibold">和值</th>
-              <th className="px-4 py-3 text-center text-xs text-gray-500 font-semibold">跨度</th>
-              <th className="px-4 py-3 text-center text-xs text-gray-500 font-semibold">奇偶</th>
-              <th className="px-4 py-3 text-center text-xs text-gray-500 font-semibold">大小</th>
-              <th className="px-4 py-3 text-center text-xs text-gray-500 font-semibold">类型</th>
+            <tr className="bg-[#f5f5f7]">
+              <th className="px-4 py-3 text-left text-xs text-[#6e6e73] font-semibold">期号</th>
+              <th className="px-4 py-3 text-left text-xs text-[#6e6e73] font-semibold">日期</th>
+              <th className="px-4 py-3 text-left text-xs text-[#6e6e73] font-semibold">开奖号码</th>
+              <th className="px-4 py-3 text-center text-xs text-[#6e6e73] font-semibold">和值</th>
+              <th className="px-4 py-3 text-center text-xs text-[#6e6e73] font-semibold">跨度</th>
+              <th className="px-4 py-3 text-center text-xs text-[#6e6e73] font-semibold">奇偶</th>
+              <th className="px-4 py-3 text-center text-xs text-[#6e6e73] font-semibold">大小</th>
+              <th className="px-4 py-3 text-center text-xs text-[#6e6e73] font-semibold">类型</th>
             </tr>
           </thead>
           <tbody>
             {draws.map((draw) => (
-              <tr key={draw.period} className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
-                <td className="px-4 py-3 text-sm font-semibold text-white">{draw.period}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">{formatDate(draw.drawDate)}</td>
+              <tr key={draw.period} className="border-b border-[#f5f5f7] hover:bg-[#f5f5f7]/50 transition-colors cursor-pointer">
+                <td className="px-4 py-3 text-sm font-semibold text-[#1d1d1f]">{draw.period}</td>
+                <td className="px-4 py-3 text-sm text-[#6e6e73]">{formatDate(draw.drawDate)}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1.5">
                     <FC3DBall digit={draw.digit1} size="sm" />
@@ -57,11 +57,11 @@ export default function DrawHistory({ draws }: DrawHistoryProps) {
                     <FC3DBall digit={draw.digit3} size="sm" />
                   </div>
                 </td>
-                <td className="px-4 py-3 text-center text-sm"><span className="text-[#00d4aa] font-semibold">{draw.sum}</span></td>
-                <td className="px-4 py-3 text-center text-sm"><span className="text-[#00d4aa] font-semibold">{draw.span}</span></td>
-                <td className="px-4 py-3 text-center text-sm text-gray-400">{draw.oddCount}:{draw.evenCount}</td>
-                <td className="px-4 py-3 text-center text-sm text-gray-400">{draw.bigCount}:{draw.smallCount}</td>
-                <td className="px-4 py-3 text-center text-sm text-gray-400">{getGroupLabel(draw.group)}</td>
+                <td className="px-4 py-3 text-center text-sm"><span className="text-[#0071e3] font-semibold">{draw.sum}</span></td>
+                <td className="px-4 py-3 text-center text-sm"><span className="text-[#0071e3] font-semibold">{draw.span}</span></td>
+                <td className="px-4 py-3 text-center text-sm text-[#6e6e73]">{draw.oddCount}:{draw.evenCount}</td>
+                <td className="px-4 py-3 text-center text-sm text-[#6e6e73]">{draw.bigCount}:{draw.smallCount}</td>
+                <td className="px-4 py-3 text-center text-sm text-[#6e6e73]">{getGroupLabel(draw.group)}</td>
               </tr>
             ))}
           </tbody>

@@ -23,7 +23,7 @@ export default function HundredsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">百位走势图</h2>
+        <h2 className="text-lg font-bold text-[#1d1d1f]">百位走势图</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
       <TrendTable

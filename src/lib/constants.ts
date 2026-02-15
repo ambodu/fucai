@@ -75,7 +75,7 @@ export const AI_DISCLAIMER_TEXT = '以上分析基于官方历史开奖数据统
 export const HEAT_COLORS = [
   { min: 0, max: 2, color: '#27ae60', label: '0-2期' },
   { min: 3, max: 5, color: '#2ecc71', label: '3-5期' },
-  { min: 6, max: 10, color: '#f1c40f', label: '6-10期' },
+  { min: 6, max: 10, color: '#f59e0b', label: '6-10期' },
   { min: 11, max: 15, color: '#e67e22', label: '11-15期' },
   { min: 16, max: 20, color: '#e74c3c', label: '16-20期' },
   { min: 21, max: Infinity, color: '#c0392b', label: '20期以上' },

@@ -17,12 +17,11 @@ export default function MobileTabBar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#0b0e11]/95 backdrop-blur-sm border-t border-white/5 flex z-50 lg:hidden pb-[env(safe-area-inset-bottom)]">
+    <div className="glass fixed bottom-0 left-0 right-0 border-t border-[#ebebed] flex z-50 lg:hidden pb-[env(safe-area-inset-bottom)]">
       {MOBILE_TABS.map((item) => {
         const isActive = pathname === item.href ||
           (item.href !== '/' && pathname.startsWith(item.href));
         const Icon = item.icon;
-        const isAI = item.href === '/ai';
         return (
           <Link
             key={item.href}
@@ -31,24 +30,20 @@ export default function MobileTabBar() {
           >
             <div className={cn(
               'w-8 h-8 rounded-2xl flex items-center justify-center mb-0.5 transition-colors',
-              isAI && isActive ? 'bg-[#7434f3]/20' :
-              isAI ? 'bg-[#7434f3]/10' :
-              isActive ? 'bg-[#7434f3]/10' : ''
+              isActive ? 'bg-[#0071e3]/8' : ''
             )}>
               <Icon
                 size={20}
                 strokeWidth={isActive ? 2.2 : 1.5}
                 className={cn(
                   'transition-colors',
-                  isAI ? 'text-[#7434f3]' :
-                  isActive ? 'text-[#7434f3]' : 'text-gray-500'
+                  isActive ? 'text-[#0071e3]' : 'text-[#6e6e73]'
                 )}
               />
             </div>
             <span className={cn(
               'text-[10px] transition-colors',
-              isAI ? 'text-[#7434f3] font-semibold' :
-              isActive ? 'text-[#7434f3] font-semibold' : 'text-gray-500'
+              isActive ? 'text-[#0071e3] font-semibold' : 'text-[#6e6e73]'
             )}>
               {item.label}
             </span>

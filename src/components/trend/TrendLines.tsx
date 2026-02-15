@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback, RefObject } from 'react';
 import { ColumnGroup } from './TrendTable';
 import { TrendCellData } from '@/types/trend';
 
-const GROUP_LINE_COLORS = ['#7434f3', '#00d4aa', '#3498db', '#e67e22'];
+const GROUP_LINE_COLORS = ['#e74c3c', '#2980b9', '#27ae60', '#e67e22'];
 
 interface TrendLinesProps {
   containerRef: RefObject<HTMLDivElement | null>;
@@ -30,58 +30,88 @@ export default function TrendLines({ containerRef, cellData, columnGroups }: Tre
 
     setSvgSize({ width: container.scrollWidth, height: container.scrollHeight });
 
-    const hitElements = container.querySelectorAll('[data-hit="true"]');
-    if (hitElements.length === 0) return;
+    // Build groups: each group is a range of column indices
+    // For single-position trend charts (no columnGroups), all columns are one group
+    // For comprehensive charts, each columnGroup defines a range
+    interface GroupRange {
+      startCol: number;
+      endCol: number; // exclusive
+      colorIdx: number;
+    }
 
-    // Group by column
-    const colHits: Record<number, { row: number; el: HTMLElement }[]> = {};
-    hitElements.forEach(el => {
-      const htmlEl = el as HTMLElement;
-      const row = parseInt(htmlEl.getAttribute('data-row') || '-1', 10);
-      const col = parseInt(htmlEl.getAttribute('data-col') || '-1', 10);
-      if (row < 0 || col < 0) return;
-      if (!colHits[col]) colHits[col] = [];
-      colHits[col].push({ row, el: htmlEl });
-    });
-
-    // Build column-to-group mapping
-    const colGroupMap: Record<number, number> = {};
+    const groups: GroupRange[] = [];
     if (columnGroups && columnGroups.length > 0) {
       let colIdx = 0;
       columnGroups.forEach((group, gi) => {
-        group.columns.forEach(() => {
-          colGroupMap[colIdx] = gi;
-          colIdx++;
-        });
+        const start = colIdx;
+        colIdx += group.columns.length;
+        groups.push({ startCol: start, endCol: colIdx, colorIdx: gi });
       });
+    } else {
+      // Single group: all columns
+      const totalCols = cellData[0]?.length || 0;
+      groups.push({ startCol: 0, endCol: totalCols, colorIdx: 0 });
     }
 
-    const newLines: LineSegment[] = [];
     const containerRect = container.getBoundingClientRect();
     const scrollLeft = container.scrollLeft;
     const scrollTop = container.scrollTop;
 
-    Object.entries(colHits).forEach(([colStr, hits]) => {
-      const col = parseInt(colStr, 10);
-      hits.sort((a, b) => a.row - b.row);
-
-      for (let i = 0; i < hits.length - 1; i++) {
-        const el1 = hits[i].el;
-        const el2 = hits[i + 1].el;
-        const r1 = el1.getBoundingClientRect();
-        const r2 = el2.getBoundingClientRect();
-
-        const x1 = r1.left - containerRect.left + scrollLeft + r1.width / 2;
-        const y1 = r1.top - containerRect.top + scrollTop + r1.height / 2;
-        const x2 = r2.left - containerRect.left + scrollLeft + r2.width / 2;
-        const y2 = r2.top - containerRect.top + scrollTop + r2.height / 2;
-
-        const groupIdx = colGroupMap[col] ?? 0;
-        const color = GROUP_LINE_COLORS[groupIdx % GROUP_LINE_COLORS.length];
-
-        newLines.push({ x1, y1, x2, y2, color });
+    // Build a map of all hit elements by (row, col) for fast lookup
+    const hitElements = container.querySelectorAll('[data-hit="true"]');
+    const hitMap: Record<string, HTMLElement> = {};
+    hitElements.forEach(el => {
+      const htmlEl = el as HTMLElement;
+      const row = htmlEl.getAttribute('data-row');
+      const col = htmlEl.getAttribute('data-col');
+      if (row !== null && col !== null) {
+        hitMap[`${row}-${col}`] = htmlEl;
       }
     });
+
+    const newLines: LineSegment[] = [];
+
+    // For each group, scan rows to find hits and connect adjacent rows
+    for (const group of groups) {
+      const color = GROUP_LINE_COLORS[group.colorIdx % GROUP_LINE_COLORS.length];
+
+      // Track previous row's hit element
+      let prevEl: HTMLElement | null = null;
+
+      for (let rowIdx = 0; rowIdx < cellData.length; rowIdx++) {
+        const row = cellData[rowIdx];
+        if (!row) continue;
+
+        // Find the hit column in this group's range for this row
+        let currentEl: HTMLElement | null = null;
+        for (let col = group.startCol; col < group.endCol; col++) {
+          if (row[col]?.isHit) {
+            const el = hitMap[`${rowIdx}-${col}`];
+            if (el) {
+              currentEl = el;
+              break;
+            }
+          }
+        }
+
+        if (currentEl && prevEl) {
+          // Draw line from prevEl to currentEl
+          const r1 = prevEl.getBoundingClientRect();
+          const r2 = currentEl.getBoundingClientRect();
+
+          const x1 = r1.left - containerRect.left + scrollLeft + r1.width / 2;
+          const y1 = r1.top - containerRect.top + scrollTop + r1.height / 2;
+          const x2 = r2.left - containerRect.left + scrollLeft + r2.width / 2;
+          const y2 = r2.top - containerRect.top + scrollTop + r2.height / 2;
+
+          newLines.push({ x1, y1, x2, y2, color });
+        }
+
+        if (currentEl) {
+          prevEl = currentEl;
+        }
+      }
+    }
 
     setLines(newLines);
     // eslint-disable-next-line react-hooks/exhaustive-deps

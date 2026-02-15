@@ -10,7 +10,7 @@ export default function TrendMobileNav() {
   const allItems = TREND_NAV_ITEMS.flatMap(g => [...g.items]);
 
   return (
-    <div className="lg:hidden overflow-x-auto scrollbar-hidden border-b border-white/5 bg-[#13161b] sticky top-0 z-10">
+    <div className="lg:hidden overflow-x-auto scrollbar-hidden border-b border-[#ebebed] bg-white sticky top-0 z-10">
       <div className="flex gap-0 px-2 min-w-max">
         {allItems.map((item) => {
           const isActive = pathname === item.href;
@@ -21,8 +21,8 @@ export default function TrendMobileNav() {
               className={cn(
                 'px-3 py-2.5 text-xs whitespace-nowrap border-b-2 transition-colors',
                 isActive
-                  ? 'text-[#7434f3] border-[#7434f3] font-semibold'
-                  : 'text-gray-500 border-transparent'
+                  ? 'text-[#0071e3] border-[#0071e3] font-semibold'
+                  : 'text-[#6e6e73] border-transparent'
               )}
             >
               {item.label}

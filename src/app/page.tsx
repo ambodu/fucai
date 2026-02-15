@@ -17,7 +17,7 @@ export default function Home() {
   const recentDraws = mockDraws.slice(1, 6);
 
   return (
-    <div className="min-h-screen pb-[70px] lg:pb-0">
+    <div className="min-h-screen pb-[70px] lg:pb-0 bg-white">
       <Navbar />
       <HeroSection />
       <DataTicker />
@@ -29,28 +29,28 @@ export default function Home() {
           {/* Recent Draws */}
           <div className="mb-6 lg:mb-0">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold text-white">近期开奖</h2>
-              <Link href="/data" className="text-xs text-gray-500 hover:text-[#7434f3] transition-colors">
+              <h2 className="text-base font-semibold text-[#1d1d1f]">近期开奖</h2>
+              <Link href="/data" className="text-xs text-[#6e6e73] hover:text-[#0071e3] transition-colors">
                 更多 ›
               </Link>
             </div>
-            <div className="bg-[#13161b] border border-white/5 rounded-2xl overflow-hidden">
+            <div className="bg-white shadow-apple rounded-2xl overflow-hidden">
               {recentDraws.map(draw => (
                 <div
                   key={draw.period}
-                  className="flex items-center justify-between px-4 py-3 border-b border-white/5 last:border-b-0"
+                  className="flex items-center justify-between px-4 py-3 border-b border-[#f5f5f7] last:border-b-0"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 w-20">{formatPeriod(draw.period)}</span>
+                    <span className="text-xs text-[#6e6e73] w-20">{formatPeriod(draw.period)}</span>
                     <div className="flex gap-1.5">
                       <FC3DBall digit={draw.digit1} size="sm" />
                       <FC3DBall digit={draw.digit2} size="sm" />
                       <FC3DBall digit={draw.digit3} size="sm" />
                     </div>
                   </div>
-                  <div className="flex gap-3 text-xs text-gray-500">
-                    <span>和值<strong className="text-[#00d4aa] ml-0.5">{draw.sum}</strong></span>
-                    <span>跨度<strong className="text-[#00d4aa] ml-0.5">{draw.span}</strong></span>
+                  <div className="flex gap-3 text-xs text-[#6e6e73]">
+                    <span>和值<strong className="text-[#0071e3] ml-0.5">{draw.sum}</strong></span>
+                    <span>跨度<strong className="text-[#0071e3] ml-0.5">{draw.span}</strong></span>
                     <span className="hidden sm:inline">{draw.bigSmallPattern}</span>
                     <span className="hidden sm:inline">{draw.oddEvenPattern}</span>
                   </div>
@@ -62,16 +62,16 @@ export default function Home() {
           {/* Trend Navigation */}
           <div className="mb-6 lg:mb-0">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold text-white">走势分析</h2>
-              <Link href="/trend" className="text-xs text-gray-500 hover:text-[#7434f3] transition-colors">
+              <h2 className="text-base font-semibold text-[#1d1d1f]">走势分析</h2>
+              <Link href="/trend" className="text-xs text-[#6e6e73] hover:text-[#0071e3] transition-colors">
                 全部图表 ›
               </Link>
             </div>
-            <div className="bg-[#13161b] border border-white/5 rounded-2xl p-4">
+            <div className="bg-white shadow-apple rounded-2xl p-4">
               <div className="space-y-4">
                 {TREND_NAV_ITEMS.map(group => (
                   <div key={group.category}>
-                    <div className="text-[11px] text-gray-500 font-semibold mb-2 uppercase tracking-wider">
+                    <div className="text-[11px] text-[#6e6e73] font-semibold mb-2 uppercase tracking-wider">
                       {group.category}
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -79,7 +79,7 @@ export default function Home() {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className="px-3 py-1.5 bg-white/5 hover:bg-[#7434f3]/10 hover:text-[#7434f3] rounded-lg text-xs text-gray-400 transition-colors"
+                          className="px-3 py-1.5 bg-[#f5f5f7] hover:bg-[#0071e3]/8 hover:text-[#0071e3] rounded-lg text-xs text-[#6e6e73] transition-colors"
                         >
                           {item.label}
                         </Link>

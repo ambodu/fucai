@@ -17,9 +17,9 @@ export default function Road012Page() {
   const columnLabels = [...roads, ...roads, ...roads];
 
   const columnGroups: ColumnGroup[] = [
-    { label: '百位', color: '#7434f3', columns: roads },
-    { label: '十位', color: '#00d4aa', columns: roads },
-    { label: '个位', color: '#3498db', columns: roads },
+    { label: '百位', color: '#0071e3', columns: roads },
+    { label: '十位', color: '#8b5cf6', columns: roads },
+    { label: '个位', color: '#10b981', columns: roads },
   ];
 
   const extraColumns = [
@@ -30,10 +30,10 @@ export default function Road012Page() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">012路走势</h2>
+        <h2 className="text-lg font-bold text-[#1d1d1f]">012路走势</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
-      <div className="text-xs text-gray-500">规则：数字除以3的余数，0路(0,3,6,9)、1路(1,4,7)、2路(2,5,8)</div>
+      <div className="text-xs text-[#6e6e73]">规则：数字除以3的余数，0路(0,3,6,9)、1路(1,4,7)、2路(2,5,8)</div>
       <TrendTable
         periods={periods}
         cellData={cellData}

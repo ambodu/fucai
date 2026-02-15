@@ -85,8 +85,8 @@ function buildDataContext(): string {
   return lines.join('\n');
 }
 
-function buildSystemPrompt(dataContext: string, chartMode: boolean): string {
-  const base = `你是"彩数通"平台的福彩3D智能分析助手。你的职责是基于提供的真实历史开奖数据，回答用户关于福彩3D的数据查询、统计分析和号码参考问题。
+function buildSystemPrompt(dataContext: string): string {
+  return `你是"彩数通"平台的福彩3D智能分析助手。你的职责是基于提供的真实历史开奖数据，回答用户关于福彩3D的数据查询、统计分析和号码参考问题。
 
 ## 核心原则
 1. 只基于提供的真实数据进行分析，不编造数据
@@ -114,15 +114,11 @@ ${dataContext}
 - 如果用户的问题超出数据范围，如实说明
 
 ## 免责提醒（每次给出号码建议时必须附加）
-以上分析仅基于历史数据统计规律，仅供参考。彩票每期开奖均为独立随机事件，历史数据不能预测未来结果。请理性购彩，量力而行。`;
-
-  if (!chartMode) return base;
-
-  return base + `
+以上分析仅基于历史数据统计规律，仅供参考。彩票每期开奖均为独立随机事件，历史数据不能预测未来结果。请理性购彩，量力而行。
 
 ## 图表数据模式（必须严格遵守）
 
-你当前处于图表模式。当回答涉及数据分析时，你必须返回结构化 JSON，格式如下：
+你必须返回结构化 JSON，格式如下：
 
 {
   "text": "你的文字分析内容（支持 Markdown）",
@@ -133,6 +129,10 @@ ${dataContext}
       "xAxis": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
       "series": [{ "name": "出现次数", "data": [5, 8, 3, 7, 6, 9, 4, 2, 8, 6] }]
     }
+  ],
+  "dataCards": [
+    { "label": "平均和值", "value": "13.5", "trend": "up", "sub": "近50期" },
+    { "label": "最大遗漏", "value": "23期", "trend": "down", "sub": "百位数字7" }
   ]
 }
 
@@ -142,12 +142,18 @@ ${dataContext}
 - 占比/分布 → "pie"（饼图）
 - 多维度对比 → "radar"（雷达图）
 
+### 数据卡片（dataCards）
+当回答包含关键指标时，在 JSON 中加入 dataCards 字段。
+trend 取值: "up"(上升/偏高), "down"(下降/偏低), "neutral"(持平)
+dataCards 用于展示关键统计数据，每次回答尽量提供 2-4 个关键指标卡片。
+
 ### 严格规则：
 1. 必须返回纯 JSON，不加 markdown 代码块标记
 2. charts 中每个图表的 data 数组长度必须与 xAxis 长度一致
 3. 如果回答不涉及数据图表，charts 为空数组 []
 4. text 字段支持 Markdown 格式
-5. series 中 name 必须有意义（如"百位频率"而不是"数据"）`;
+5. series 中 name 必须有意义（如"百位频率"而不是"数据"）
+6. dataCards 为空时可省略或设为空数组`;
 }
 
 // --- Provider implementations ---
@@ -239,7 +245,7 @@ async function callGemini(systemPrompt: string, messages: Message[]): Promise<st
   return response.text || '';
 }
 
-// --- Parse AI response for chart mode ---
+// --- Parse AI response ---
 
 interface AIResponse {
   content: string;
@@ -249,16 +255,22 @@ interface AIResponse {
     xAxis?: string[];
     series: Array<{ name: string; data: number[]; color?: string }>;
   }>;
+  dataCards?: Array<{
+    label: string;
+    value: string;
+    trend?: 'up' | 'down' | 'neutral';
+    sub?: string;
+  }>;
 }
 
 function parseChartResponse(raw: string): AIResponse {
   try {
-    // Try parsing as JSON directly
     const parsed = JSON.parse(raw);
     if (parsed.text !== undefined) {
       return {
         content: parsed.text || '',
         charts: Array.isArray(parsed.charts) ? parsed.charts : [],
+        dataCards: Array.isArray(parsed.dataCards) ? parsed.dataCards : [],
       };
     }
   } catch {
@@ -274,6 +286,7 @@ function parseChartResponse(raw: string): AIResponse {
         return {
           content: parsed.text || '',
           charts: Array.isArray(parsed.charts) ? parsed.charts : [],
+          dataCards: Array.isArray(parsed.dataCards) ? parsed.dataCards : [],
         };
       }
     } catch {
@@ -282,14 +295,13 @@ function parseChartResponse(raw: string): AIResponse {
   }
 
   // Fallback: treat entire response as plain text
-  return { content: raw, charts: [] };
+  return { content: raw, charts: [], dataCards: [] };
 }
 
 // --- Route handler ---
 
 interface ChatRequestBody {
   messages: Array<{ role: 'user' | 'assistant'; content: string }>;
-  chartMode?: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -317,11 +329,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const chartMode = body.chartMode === true;
-
   try {
     const dataContext = buildDataContext();
-    const systemPrompt = buildSystemPrompt(dataContext, chartMode);
+    const systemPrompt = buildSystemPrompt(dataContext);
     const recentMessages = body.messages.slice(-10).map(m => ({
       role: m.role as 'user' | 'assistant',
       content: m.content,
@@ -345,13 +355,8 @@ export async function POST(request: NextRequest) {
             break;
         }
 
-        // Parse response based on chart mode
-        if (chartMode) {
-          const parsed = parseChartResponse(text);
-          return NextResponse.json(parsed);
-        }
-
-        return NextResponse.json({ content: text });
+        const parsed = parseChartResponse(text);
+        return NextResponse.json(parsed);
       } catch (err) {
         lastError = err;
         const status = (err as { status?: number }).status;

@@ -1,127 +1,181 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import * as echarts from 'echarts/core';
-import { BarChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Sparkles, ArrowRight } from 'lucide-react';
-import { CHART_COLORS, CHART_THEME } from '@/lib/echarts-theme';
+import { Sparkles, Send, ArrowRight, Loader2, MessageSquare } from 'lucide-react';
+import { QUICK_TEMPLATES } from '@/lib/constants';
 
-echarts.use([BarChart, GridComponent, TooltipComponent, CanvasRenderer]);
+const STORAGE_KEY = 'cst-chat-history';
 
-const DEMO_CONVERSATION = [
-  {
-    role: 'user' as const,
-    text: '分析最近50期各数字出现频率',
-  },
-  {
-    role: 'assistant' as const,
-    text: '根据最近50期数据统计，各数字出现频率如下。数字 **5** 和 **8** 出现最为频繁，属于当前热号；数字 **2** 和 **0** 出现较少，处于偏冷状态。',
-    chart: {
-      xAxis: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-      data: [5, 8, 3, 7, 6, 12, 4, 9, 11, 6],
-    },
-  },
-];
-
-function DemoChart({ xAxis, data }: { xAxis: string[]; data: number[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const chart = echarts.init(ref.current);
-    chart.setOption({
-      backgroundColor: 'transparent',
-      tooltip: { ...CHART_THEME.tooltip, trigger: 'axis' },
-      grid: { top: 15, right: 10, bottom: 25, left: 35 },
-      xAxis: {
-        type: 'category',
-        data: xAxis,
-        axisLabel: { fontSize: 10, color: '#9ca3af' },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-        axisTick: { show: false },
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: { fontSize: 10, color: '#6b7280' },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
-        axisLine: { show: false },
-      },
-      series: [{
-        type: 'bar',
-        data: data.map((v, i) => ({
-          value: v,
-          itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: CHART_COLORS[i % CHART_COLORS.length] },
-              { offset: 1, color: `${CHART_COLORS[i % CHART_COLORS.length]}60` },
-            ]),
-            borderRadius: [3, 3, 0, 0],
-          },
-        })),
-        barMaxWidth: 22,
-      }],
-    });
-    const handleResize = () => chart.resize();
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.dispose();
-    };
-  }, [xAxis, data]);
-
-  return <div ref={ref} className="w-full h-[180px]" />;
+interface SimpleChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
 }
 
 export default function AIDemo() {
-  return (
-    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 py-8">
-      <div className="text-center mb-6">
-        <h2 className="text-lg font-bold text-white mb-1">AI 对话分析体验</h2>
-        <p className="text-xs text-gray-500">向 AI 提问任何数据分析问题，获取结构化图表回复</p>
-      </div>
+  const [input, setInput] = useState('');
+  const [preview, setPreview] = useState<SimpleChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-      <div className="bg-[#13161b] border border-white/5 rounded-2xl p-4 lg:p-6 max-w-[700px] mx-auto">
-        {/* Demo messages */}
-        <div className="space-y-4 mb-5">
-          {DEMO_CONVERSATION.map((msg, i) => (
-            <div key={i} className={`flex gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-bold ${
-                msg.role === 'assistant'
-                  ? 'bg-gradient-to-br from-[#7434f3] to-[#9b59b6] text-white'
-                  : 'bg-white/10 text-gray-400'
-              }`}>
-                {msg.role === 'assistant' ? 'AI' : 'Me'}
-              </div>
-              <div className={`px-3.5 py-2.5 rounded-xl text-xs leading-relaxed max-w-[85%] ${
-                msg.role === 'assistant'
-                  ? 'bg-white/5 border border-white/5 text-gray-300 rounded-tl-sm'
-                  : 'bg-[#7434f3]/10 text-gray-300 rounded-tr-sm'
-              }`}>
-                <div dangerouslySetInnerHTML={{
-                  __html: msg.text.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>')
-                }} />
-                {'chart' in msg && msg.chart && (
-                  <div className="mt-2">
-                    <DemoChart xAxis={msg.chart.xAxis} data={msg.chart.data} />
-                  </div>
-                )}
-              </div>
+  const handleSend = useCallback(async (question?: string) => {
+    const text = question || input.trim();
+    if (!text || isLoading) return;
+
+    const userMsg: SimpleChatMessage = {
+      id: String(Date.now()),
+      role: 'user',
+      content: text,
+      timestamp: Date.now(),
+    };
+
+    setPreview(prev => [...prev.slice(-2), userMsg]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: text }],
+          chartMode: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '请求失败');
+
+      const aiMsg: SimpleChatMessage = {
+        id: String(Date.now() + 1),
+        role: 'assistant',
+        content: data.content,
+        timestamp: Date.now(),
+      };
+
+      setPreview(prev => {
+        const updated = [...prev, aiMsg].slice(-3);
+
+        try {
+          const existing = localStorage.getItem(STORAGE_KEY);
+          const history = existing ? JSON.parse(existing) : [];
+          history.push(userMsg, aiMsg);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(-100)));
+        } catch {
+          // ignore
+        }
+
+        return updated;
+      });
+    } catch {
+      const errorMsg: SimpleChatMessage = {
+        id: String(Date.now() + 1),
+        role: 'assistant',
+        content: '查询出错，请稍后重试。',
+        timestamp: Date.now(),
+      };
+      setPreview(prev => [...prev, errorMsg].slice(-3));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [input, isLoading]);
+
+  return (
+    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6">
+      <div className="bg-white shadow-apple rounded-2xl overflow-hidden">
+        {/* Header */}
+        <div className="px-4 py-3 border-b border-[#ebebed] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] flex items-center justify-center">
+              <Sparkles size={14} className="text-white" />
             </div>
+            <div>
+              <h3 className="text-sm font-bold text-[#1d1d1f]">AI 智能分析</h3>
+              <p className="text-[10px] text-[#6e6e73]">基于历史数据的智能问答</p>
+            </div>
+          </div>
+          <Link
+            href="/ai"
+            className="flex items-center gap-1 text-xs text-[#0071e3] hover:text-[#0077ed] transition-colors"
+          >
+            完整对话 <ArrowRight size={12} />
+          </Link>
+        </div>
+
+        {/* Message area */}
+        <div className="px-4 py-3 min-h-[120px] max-h-[200px] overflow-y-auto">
+          {preview.length === 0 ? (
+            <div className="text-center py-4">
+              <MessageSquare size={24} className="text-[#ebebed] mx-auto mb-2" />
+              <p className="text-xs text-[#6e6e73]">试试向 AI 提问</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {preview.map(msg => (
+                <div key={msg.id} className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`w-6 h-6 rounded-md shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                    msg.role === 'assistant'
+                      ? 'bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] text-white'
+                      : 'bg-[#f5f5f7] text-[#6e6e73]'
+                  }`}>
+                    {msg.role === 'assistant' ? 'AI' : 'Me'}
+                  </div>
+                  <div className={`px-3 py-2 rounded-xl text-xs leading-relaxed max-w-[85%] ${
+                    msg.role === 'assistant'
+                      ? 'bg-[#f5f5f7] text-[#1d1d1f] rounded-tl-sm'
+                      : 'bg-[#0071e3] text-white rounded-tr-sm'
+                  }`}>
+                    <div className="line-clamp-4">{msg.content}</div>
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex gap-2">
+                  <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] flex items-center justify-center text-[10px] text-white font-bold">AI</div>
+                  <div className="px-3 py-2 rounded-xl rounded-tl-sm bg-[#f5f5f7] text-xs text-[#6e6e73]">
+                    <Loader2 size={12} className="animate-spin inline mr-1" />分析中...
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Quick templates */}
+        <div className="px-4 py-2 flex gap-1.5 flex-wrap border-t border-[#f5f5f7]">
+          {QUICK_TEMPLATES.slice(0, 4).map(t => (
+            <button
+              key={t.id}
+              onClick={() => handleSend(t.question)}
+              disabled={isLoading}
+              className="px-2.5 py-1 rounded-full text-[10px] text-[#6e6e73] border border-[#ebebed] hover:bg-[#0071e3]/8 hover:text-[#0071e3] hover:border-[#0071e3]/20 transition-colors disabled:opacity-30"
+            >
+              {t.label}
+            </button>
           ))}
         </div>
 
-        {/* CTA */}
-        <Link
-          href="/ai"
-          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-gradient-to-r from-[#7434f3] to-[#9b59b6] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-        >
-          <Sparkles size={14} />
-          开始与 AI 对话
-          <ArrowRight size={14} />
-        </Link>
+        {/* Input */}
+        <div className="px-4 py-3 border-t border-[#ebebed] flex gap-2 items-center">
+          <div className="flex-1 flex items-center bg-[#f5f5f7] border border-[#ebebed] rounded-xl px-3 py-2 gap-1.5 focus-within:border-[#0071e3]/30 transition-all">
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+              disabled={isLoading}
+              className="flex-1 bg-transparent text-xs outline-none placeholder:text-[#6e6e73]/60 text-[#1d1d1f] disabled:opacity-50"
+              placeholder="问问AI..."
+            />
+          </div>
+          <button
+            onClick={() => handleSend()}
+            disabled={isLoading || !input.trim()}
+            className="w-8 h-8 rounded-xl bg-[#0071e3] flex items-center justify-center text-white shrink-0 hover:bg-[#0077ed] transition-colors disabled:opacity-30"
+          >
+            <Send size={13} />
+          </button>
+        </div>
       </div>
     </section>
   );

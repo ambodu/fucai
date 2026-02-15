@@ -9,9 +9,17 @@ export interface ChartData {
   }>;
 }
 
+export interface DataCard {
+  label: string;
+  value: string;
+  trend?: 'up' | 'down' | 'neutral';
+  sub?: string;
+}
+
 export interface AIResponse {
   text: string;
   charts: ChartData[];
+  dataCards?: DataCard[];
 }
 
 export interface ChatMessage {
@@ -21,6 +29,24 @@ export interface ChatMessage {
   timestamp: number;
   disclaimer?: boolean;
   charts?: ChartData[];
+  dataCards?: DataCard[];
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  messages: ChatMessage[];
+}
+
+export interface ConversationMeta {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  messageCount: number;
+  preview: string;
 }
 
 export interface QuickTemplate {
