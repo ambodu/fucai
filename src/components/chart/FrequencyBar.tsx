@@ -7,6 +7,7 @@ import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/compon
 import { CanvasRenderer } from 'echarts/renderers';
 import { FC3DStatistics } from '@/types/fc3d';
 import { getPositionLabel } from '@/utils/fc3d-calc';
+import { CHART_THEME } from '@/lib/echarts-theme';
 
 echarts.use([BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -33,29 +34,23 @@ export default function FrequencyBar({ statistics, position, periods = 50 }: Fre
     chart.setOption({
       backgroundColor: 'transparent',
       tooltip: {
+        ...CHART_THEME.tooltip,
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
-        backgroundColor: '#ffffff',
-        borderColor: '#ebebed',
-        textStyle: { color: '#1d1d1f', fontSize: 12 },
         formatter: (params: unknown) => {
           const p = (params as Array<{ name: string; value: number }>)[0];
           return `数字 ${p.name}<br/>出现 <b>${p.value}次</b><br/>频率 ${((p.value / periods) * 100).toFixed(1)}%`;
         },
       },
-      grid: { top: 30, right: 20, bottom: 30, left: 40 },
+      grid: CHART_THEME.grid,
       xAxis: {
         type: 'category',
         data: posStats.map(s => String(s.digit)),
-        axisLabel: { fontSize: 12, color: '#6e6e73' },
-        axisLine: { lineStyle: { color: '#ebebed' } },
-        axisTick: { lineStyle: { color: '#ebebed' } },
+        ...CHART_THEME.xAxis,
       },
       yAxis: {
         type: 'value',
-        axisLabel: { fontSize: 11, color: '#6e6e73' },
-        axisLine: { lineStyle: { color: '#ebebed' } },
-        splitLine: { lineStyle: { color: '#f5f5f7' } },
+        ...CHART_THEME.yAxis,
       },
       series: [{
         type: 'bar',
@@ -63,10 +58,10 @@ export default function FrequencyBar({ statistics, position, periods = 50 }: Fre
           value: c,
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#0071e3' },
-              { offset: 1, color: '#0077ed' },
+              { offset: 0, color: '#007AFF' },
+              { offset: 1, color: '#007AFF80' },
             ]),
-            borderRadius: [4, 4, 0, 0],
+            borderRadius: [6, 6, 0, 0],
           },
         })),
         barWidth: '60%',
@@ -74,7 +69,7 @@ export default function FrequencyBar({ statistics, position, periods = 50 }: Fre
           show: true,
           position: 'top',
           fontSize: 10,
-          color: '#6e6e73',
+          color: '#8e8e93',
         },
       }],
     });
@@ -90,7 +85,7 @@ export default function FrequencyBar({ statistics, position, periods = 50 }: Fre
 
   return (
     <div>
-      <h4 className="text-sm font-bold mb-2 text-[#1d1d1f]">
+      <h4 className="text-[14px] font-semibold mb-2 text-[#1d1d1f]">
         {getPositionLabel(position)}频率分布（近{periods}期）
       </h4>
       <div ref={chartRef} className="w-full h-[250px] lg:h-[300px]" />

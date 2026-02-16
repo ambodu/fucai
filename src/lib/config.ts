@@ -10,14 +10,27 @@
 
 export type AIProvider = 'openai' | 'anthropic' | 'gemini';
 
+const VALID_PROVIDERS = new Set<AIProvider>(['openai', 'anthropic', 'gemini']);
+
+function getAIProvider(): AIProvider {
+  const raw = process.env.AI_PROVIDER || 'openai';
+  if (VALID_PROVIDERS.has(raw as AIProvider)) return raw as AIProvider;
+  console.warn(`[config] Invalid AI_PROVIDER "${raw}", falling back to "openai"`);
+  return 'openai';
+}
+
 export const aiConfig = {
-  provider: (process.env.AI_PROVIDER || 'openai') as AIProvider,
+  provider: getAIProvider(),
   baseUrl: process.env.AI_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode',
   apiKey: process.env.AI_API_KEY || '',
   model: process.env.AI_MODEL || 'qwen-plus',
   maxTokens: 8192,
   timeout: 60000,
 };
+
+if (!aiConfig.apiKey && typeof window === 'undefined') {
+  console.warn('[config] AI_API_KEY is not set. AI features will be disabled.');
+}
 
 // --- 数据同步配置 ---
 

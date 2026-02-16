@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { execSync } from 'child_process';
+import { timingSafeEqual } from 'crypto';
 import { syncConfig } from '@/lib/config';
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  } catch {
+    return false;
+  }
+}
 
 /**
  * POST /api/sync
@@ -24,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (secret !== syncConfig.secret) {
+  if (!secret || !safeCompare(secret, syncConfig.secret)) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }

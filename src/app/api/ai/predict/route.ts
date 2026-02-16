@@ -16,6 +16,7 @@ interface PredictionData {
   spanRange: [number, number];
   confidence: string;
   analysis: string;
+  isAIGenerated: boolean;
 }
 
 function buildPredictionContext(): string {
@@ -135,6 +136,13 @@ async function callAI(prompt: string): Promise<string> {
   }
 }
 
+function validateDigits(arr: unknown): number[] {
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .map(Number)
+    .filter(n => Number.isInteger(n) && n >= 0 && n <= 9);
+}
+
 function generateFallbackPrediction(currentPeriod: string): PredictionData {
   const draws = getRecentDraws(50);
   const result: { hundreds: number[]; tens: number[]; ones: number[] } = { hundreds: [], tens: [], ones: [] };
@@ -175,6 +183,7 @@ function generateFallbackPrediction(currentPeriod: string): PredictionData {
     spanRange: [Math.max(0, Math.round(avgSpan - 2)), Math.min(9, Math.round(avgSpan + 2))],
     confidence: '基于近50期统计数据',
     analysis: '综合频率分析和遗漏回补分析',
+    isAIGenerated: false,
   };
 }
 
@@ -202,13 +211,14 @@ export async function GET() {
     const nextPeriodNum = parseInt(currentPeriod) + 1;
     const prediction: PredictionData = {
       nextPeriod: String(nextPeriodNum),
-      hundreds: (parsed.hundreds || []).slice(0, 4),
-      tens: (parsed.tens || []).slice(0, 4),
-      ones: (parsed.ones || []).slice(0, 4),
+      hundreds: validateDigits(parsed.hundreds).slice(0, 4),
+      tens: validateDigits(parsed.tens).slice(0, 4),
+      ones: validateDigits(parsed.ones).slice(0, 4),
       sumRange: parsed.sumRange || [8, 20],
       spanRange: parsed.spanRange || [3, 7],
       confidence: parsed.confidence || '基于近50期数据分析',
       analysis: parsed.analysis || '综合频率和遗漏分析',
+      isAIGenerated: true,
     };
 
     cachedPrediction = { data: prediction, period: currentPeriod, timestamp: Date.now() };

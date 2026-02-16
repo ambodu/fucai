@@ -137,10 +137,10 @@ export const DISCLAIMER_TEXT = '免责声明：本平台仅提供福彩3D历史�
 export const AI_DISCLAIMER_TEXT = '以上分析基于官方历史开奖数据统计，仅供参考。彩票开奖为独立随机事件，历史数据不代表未来结果，请理性购彩。';
 
 export const HEAT_COLORS = [
-  { min: 0, max: 2, color: '#27ae60', label: '0-2期' },
-  { min: 3, max: 5, color: '#2ecc71', label: '3-5期' },
-  { min: 6, max: 10, color: '#f59e0b', label: '6-10期' },
-  { min: 11, max: 15, color: '#e67e22', label: '11-15期' },
-  { min: 16, max: 20, color: '#e74c3c', label: '16-20期' },
-  { min: 21, max: Infinity, color: '#c0392b', label: '20期以上' },
+  { min: 0, max: 2, color: '#34C759', label: '0-2期' },
+  { min: 3, max: 5, color: '#30D158', label: '3-5期' },
+  { min: 6, max: 10, color: '#FF9500', label: '6-10期' },
+  { min: 11, max: 15, color: '#FF6B00', label: '11-15期' },
+  { min: 16, max: 20, color: '#FF3B30', label: '16-20期' },
+  { min: 21, max: Infinity, color: '#D70015', label: '20期以上' },
 ] as const;

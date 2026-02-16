@@ -37,32 +37,32 @@ export default function DataPage() {
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <div className="min-h-screen pb-[68px] lg:pb-0">
+    <div className="min-h-screen pb-[52px] lg:pb-0 bg-white">
       <Navbar />
 
       {/* Header */}
-      <div className="bg-white border-b border-[#ebebed] px-4 pt-5 pb-5 lg:py-10">
-        <div className="max-w-[1200px] mx-auto lg:px-6">
-          <h1 className="text-[#1d1d1f] text-xl lg:text-2xl font-bold mb-1">数据中心</h1>
-          <p className="text-[#6e6e73] text-[13px] lg:text-sm">
+      <div className="bg-white border-b border-[#e5e5ea] px-4 pt-6 pb-5 lg:py-8">
+        <div className="max-w-[980px] mx-auto lg:px-6">
+          <h1 className="text-[#1d1d1f] text-xl lg:text-2xl font-semibold mb-1">数据中心</h1>
+          <p className="text-[#8e8e93] text-[13px] lg:text-[14px]">
             福彩3D 历史开奖数据查询 · 共 {mockDraws.length.toLocaleString()} 期
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-3">
+      <div className="max-w-[980px] mx-auto px-4 lg:px-6 py-4">
         <div className="flex items-center gap-3 flex-wrap">
           {/* Group filter */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hidden">
+          <div className="flex gap-1.5 bg-[#f5f5f7] rounded-full p-1">
             {GROUP_FILTERS.map(f => (
               <button
                 key={f.value}
                 onClick={() => { setGroupFilter(f.value); setPage(1); }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap active:scale-95 ${
+                className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all whitespace-nowrap ${
                   groupFilter === f.value
-                    ? 'bg-[#0071e3] text-white shadow-sm shadow-[#0071e3]/20'
-                    : 'bg-[#f5f5f7] text-[#6e6e73] hover:bg-[#ebebed]'
+                    ? 'bg-[#1d1d1f] text-white shadow-sm'
+                    : 'text-[#8e8e93] hover:text-[#1d1d1f]'
                 }`}
               >
                 {f.label}
@@ -76,40 +76,40 @@ export default function DataPage() {
               value={searchPeriod}
               onChange={e => { setSearchPeriod(e.target.value); setPage(1); }}
               placeholder="搜索期号..."
-              className="px-3.5 py-2 rounded-xl border border-[#ebebed] bg-white text-[13px] outline-none focus:border-[#0071e3]/50 focus:shadow-sm focus:shadow-[#0071e3]/5 text-[#1d1d1f] placeholder:text-[#6e6e73]/60 w-[130px] lg:w-[200px] transition-all"
+              className="px-4 py-2 rounded-xl bg-[#f5f5f7] text-[13px] outline-none focus:ring-2 focus:ring-[#007AFF]/20 text-[#1d1d1f] placeholder:text-[#8e8e93]/50 w-[130px] lg:w-[200px] transition-all"
             />
           </div>
         </div>
 
         {/* Result count */}
-        <div className="text-xs text-[#6e6e73] mt-2.5">
+        <div className="text-[12px] text-[#8e8e93] mt-3">
           共 {filtered.length.toLocaleString()} 条记录
           {groupFilter !== 'all' && `（${GROUP_FILTERS.find(f => f.value === groupFilter)?.label}）`}
         </div>
       </div>
 
       {/* Data Table */}
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 pb-4">
+      <div className="max-w-[980px] mx-auto px-4 lg:px-6 pb-4">
         <DrawHistory draws={paged} />
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="max-w-[1200px] mx-auto px-4 lg:px-6 pb-6 flex items-center justify-center gap-2">
+        <div className="max-w-[980px] mx-auto px-4 lg:px-6 pb-6 flex items-center justify-center gap-2">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-xl text-sm border border-[#ebebed] text-[#6e6e73] disabled:opacity-30 hover:bg-[#f5f5f7] active:scale-95 transition-all"
+            className="px-5 py-2 rounded-full text-[13px] border border-[#e5e5ea] text-[#8e8e93] disabled:opacity-30 hover:bg-[#f5f5f7] transition-all"
           >
             上一页
           </button>
-          <span className="text-sm text-[#6e6e73] px-2">
+          <span className="text-[13px] text-[#8e8e93] px-3">
             {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 rounded-xl text-sm border border-[#ebebed] text-[#6e6e73] disabled:opacity-30 hover:bg-[#f5f5f7] active:scale-95 transition-all"
+            className="px-5 py-2 rounded-full text-[13px] border border-[#e5e5ea] text-[#8e8e93] disabled:opacity-30 hover:bg-[#f5f5f7] transition-all"
           >
             下一页
           </button>
@@ -117,9 +117,9 @@ export default function DataPage() {
       )}
 
       {/* Statistics summary */}
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 pb-6">
-        <div className="bg-white rounded-2xl shadow-apple p-4 lg:p-6">
-          <h3 className="text-[15px] font-bold mb-4 text-[#1d1d1f]">数据概览</h3>
+      <div className="max-w-[980px] mx-auto px-4 lg:px-6 pb-8">
+        <div className="rounded-2xl shadow-card bg-white p-5 lg:p-6">
+          <h3 className="text-[14px] font-semibold mb-4 text-[#1d1d1f]">数据概览</h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: '总期数', value: mockDraws.length, unit: '期' },
@@ -128,10 +128,10 @@ export default function DataPage() {
               { label: '组六次数', value: mockDraws.filter(d => d.group === 'six').length, unit: '次' },
             ].map(item => (
               <div key={item.label} className="bg-[#f5f5f7] rounded-xl p-3.5 text-center">
-                <div className="text-[11px] text-[#6e6e73] mb-1.5">{item.label}</div>
-                <div className="text-lg font-bold text-[#0071e3]">
+                <div className="text-[11px] text-[#8e8e93] mb-1">{item.label}</div>
+                <div className="text-xl font-semibold text-[#1d1d1f]">
                   {item.value.toLocaleString()}
-                  <span className="text-xs text-[#6e6e73] font-normal ml-0.5">{item.unit}</span>
+                  <span className="text-[12px] text-[#8e8e93] font-normal ml-0.5">{item.unit}</span>
                 </div>
               </div>
             ))}

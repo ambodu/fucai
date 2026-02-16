@@ -17,41 +17,50 @@ export default function Home() {
   const recentDraws = mockDraws.slice(1, 6);
 
   return (
-    <div className="min-h-screen pb-[68px] lg:pb-0 bg-white">
+    <div className="min-h-screen pb-[52px] lg:pb-0 bg-white">
       <Navbar />
       <HeroSection />
-      <DataTicker />
+
+      {/* Navigation cards */}
+      <div className="py-8 lg:py-12 bg-[#f5f5f7]">
+        <DataTicker />
+      </div>
+
+      {/* Stats */}
+      <div className="pt-8 lg:pt-12">
+        <FeatureCards />
+      </div>
+
       <AIDemo />
-      <FeatureCards />
 
       {/* Two Column: Recent Draws + Trend Nav */}
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-8 lg:py-10">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+      <div className="max-w-[980px] mx-auto px-4 lg:px-6 py-8 lg:py-12">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-5">
           {/* Recent Draws */}
-          <div className="mb-6 lg:mb-0">
+          <div className="mb-5 lg:mb-0">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[17px] font-bold text-[#1d1d1f]">近期开奖</h2>
-              <Link href="/data" className="text-xs text-[#0071e3] hover:text-[#0077ed] transition-colors font-medium">
-                查看全部 ›
+              <h2 className="apple-section-title">近期开奖</h2>
+              <Link href="/data" className="text-[13px] text-[#E13C39] hover:underline font-medium">
+                查看全部 &rsaquo;
               </Link>
             </div>
-            <div className="bg-white shadow-apple rounded-2xl overflow-hidden">
+            <div className="apple-card overflow-hidden">
               {recentDraws.map(draw => (
                 <div
                   key={draw.period}
-                  className="flex items-center justify-between px-4 py-3.5 border-b border-[#f5f5f7] last:border-b-0"
+                  className="flex items-center justify-between px-4 py-3 border-b border-[#f2f2f7] last:border-b-0 hover:bg-[#f5f5f7] transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-[#6e6e73] w-20 shrink-0">{formatPeriod(draw.period)}</span>
+                    <span className="text-[13px] text-[#8e8e93] w-20 shrink-0">{formatPeriod(draw.period)}</span>
                     <div className="flex gap-1.5">
                       <FC3DBall digit={draw.digit1} size="sm" />
                       <FC3DBall digit={draw.digit2} size="sm" />
                       <FC3DBall digit={draw.digit3} size="sm" />
                     </div>
                   </div>
-                  <div className="flex gap-3 text-xs text-[#6e6e73]">
-                    <span>和值<strong className="text-[#0071e3] ml-0.5">{draw.sum}</strong></span>
-                    <span>跨度<strong className="text-[#0071e3] ml-0.5">{draw.span}</strong></span>
+                  <div className="flex gap-4 text-[13px] text-[#8e8e93]">
+                    <span>和值<strong className="text-[#1d1d1f] ml-0.5">{draw.sum}</strong></span>
+                    <span>跨度<strong className="text-[#1d1d1f] ml-0.5">{draw.span}</strong></span>
                     <span className="hidden sm:inline">{draw.bigSmallPattern}</span>
                     <span className="hidden sm:inline">{draw.oddEvenPattern}</span>
                   </div>
@@ -61,18 +70,18 @@ export default function Home() {
           </div>
 
           {/* Trend Navigation */}
-          <div className="mb-6 lg:mb-0">
+          <div className="mb-5 lg:mb-0">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[17px] font-bold text-[#1d1d1f]">走势分析</h2>
-              <Link href="/trend" className="text-xs text-[#0071e3] hover:text-[#0077ed] transition-colors font-medium">
-                全部图表 ›
+              <h2 className="apple-section-title">走势分析</h2>
+              <Link href="/trend" className="text-[13px] text-[#E13C39] hover:underline font-medium">
+                全部图表 &rsaquo;
               </Link>
             </div>
-            <div className="bg-white shadow-apple rounded-2xl p-5">
-              <div className="space-y-5">
+            <div className="apple-card p-4 lg:p-5">
+              <div className="space-y-4">
                 {TREND_NAV_ITEMS.map(group => (
                   <div key={group.category}>
-                    <div className="text-[11px] text-[#6e6e73] font-semibold mb-2.5 uppercase tracking-wider">
+                    <div className="text-[12px] text-[#8e8e93] font-semibold mb-2 uppercase tracking-wider">
                       {group.category}
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -80,7 +89,7 @@ export default function Home() {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className="px-3.5 py-2 bg-[#f5f5f7] hover:bg-[#0071e3]/8 hover:text-[#0071e3] rounded-xl text-xs text-[#6e6e73] transition-all active:scale-95"
+                          className="px-3 py-1.5 bg-[#f5f5f7] hover:bg-[#e5e5ea] rounded-full text-[13px] text-[#1d1d1f] transition-all"
                         >
                           {item.label}
                         </Link>

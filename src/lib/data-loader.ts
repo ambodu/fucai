@@ -62,7 +62,7 @@ export function rawToFC3DDraw(raw: RawDraw, index: number): FC3DDraw {
     bigCount: digits.filter(d => d >= 5).length,
     smallCount: digits.filter(d => d < 5).length,
     isTriplet: group === 'triplet',
-    isPair: group === 'triplet' || group === 'pair',
+    isPair: group === 'pair',
     isSequence: isSequence(d1, d2, d3),
     group,
     bigSmallPattern: getBigSmallPattern(d1, d2, d3),

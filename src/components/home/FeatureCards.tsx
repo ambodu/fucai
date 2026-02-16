@@ -31,21 +31,21 @@ export default function FeatureCards() {
   ];
 
   return (
-    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 pb-6 lg:pb-8">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <section className="max-w-[980px] mx-auto px-4 lg:px-6 pb-6 lg:pb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
         {stats.map(s => (
           <div
             key={s.label}
-            className="bg-white shadow-apple rounded-2xl p-4 lg:p-5 hover:shadow-apple-lg transition-all"
+            className="apple-card-hover p-5 lg:p-6"
           >
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#0071e3]/8">
-                <s.icon size={17} className="text-[#0071e3]" />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#f5f5f7]">
+                <s.icon size={16} className="text-[#1d1d1f]" />
               </div>
-              <span className="text-xs text-[#6e6e73] font-medium">{s.label}</span>
+              <span className="text-[13px] text-[#8e8e93] font-medium">{s.label}</span>
             </div>
-            <div className="text-2xl lg:text-[28px] font-bold text-[#1d1d1f]">{s.value}</div>
-            {s.sub && <div className="text-[11px] text-[#6e6e73] mt-1">{s.sub}</div>}
+            <div className="text-2xl lg:text-3xl font-semibold text-[#1d1d1f]">{s.value}</div>
+            {s.sub && <div className="text-[12px] text-[#8e8e93] mt-1">{s.sub}</div>}
           </div>
         ))}
       </div>

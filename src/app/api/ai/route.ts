@@ -4,6 +4,30 @@ import { getRecentDraws } from '@/lib/data-loader';
 import { getFullHistory } from '@/lib/data-loader-server';
 import { detectQueryType, buildChartData } from '@/lib/chart-builder';
 
+// --- Simple in-memory rate limiter ---
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 15; // 15 requests per minute per IP
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  entry.count++;
+  return entry.count <= RATE_LIMIT_MAX;
+}
+
+// Clean up stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  rateLimitMap.forEach((entry, key) => {
+    if (now > entry.resetTime) rateLimitMap.delete(key);
+  });
+}, 5 * 60 * 1000);
+
 // --- Data context builder ---
 
 function getDigit(draw: { digit1: number; digit2: number; digit3: number }, pos: number): number {
@@ -418,6 +442,17 @@ interface ChatRequestBody {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || request.headers.get('x-real-ip')
+    || 'unknown';
+  if (!checkRateLimit(clientIp)) {
+    return NextResponse.json(
+      { error: '请求过于频繁，请稍后再试' },
+      { status: 429 }
+    );
+  }
+
   if (!aiConfig.apiKey) {
     return NextResponse.json(
       { error: 'AI 功能未配置，请设置 AI_API_KEY' },
@@ -440,6 +475,39 @@ export async function POST(request: NextRequest) {
       { error: 'Messages array required' },
       { status: 400 }
     );
+  }
+
+  // Validate individual messages
+  const MAX_MESSAGE_LENGTH = 2000;
+  const MAX_MESSAGES = 20;
+  const validRoles = new Set(['user', 'assistant']);
+
+  if (body.messages.length > MAX_MESSAGES) {
+    return NextResponse.json(
+      { error: `最多支持 ${MAX_MESSAGES} 条消息` },
+      { status: 400 }
+    );
+  }
+
+  for (const msg of body.messages) {
+    if (!msg.role || !validRoles.has(msg.role)) {
+      return NextResponse.json(
+        { error: 'Invalid message role' },
+        { status: 400 }
+      );
+    }
+    if (typeof msg.content !== 'string' || msg.content.length === 0) {
+      return NextResponse.json(
+        { error: 'Message content required' },
+        { status: 400 }
+      );
+    }
+    if (msg.content.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json(
+        { error: `单条消息不能超过 ${MAX_MESSAGE_LENGTH} 个字符` },
+        { status: 400 }
+      );
+    }
   }
 
   // Detect query type from the latest user message

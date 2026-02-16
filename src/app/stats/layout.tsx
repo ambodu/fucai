@@ -5,9 +5,9 @@ import StatsNav from './StatsNav';
 
 export default function StatsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen pb-[70px] lg:pb-0">
+    <div className="min-h-screen pb-[52px] lg:pb-0 bg-white">
       <Navbar />
-      <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-4 lg:flex lg:gap-5">
+      <div className="max-w-[1120px] mx-auto px-4 lg:px-6 py-4 lg:flex lg:gap-5">
         <StatsNav />
         <div className="flex-1 min-w-0">{children}</div>
       </div>

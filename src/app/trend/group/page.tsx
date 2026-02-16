@@ -46,32 +46,32 @@ export default function GroupTrendPage() {
   }, []);
 
   const groups = [
-    { key: 'six' as const, label: '组六', color: 'from-[#27ae60] to-[#1e8449]', badgeColor: 'bg-[#27ae60]' },
-    { key: 'pair' as const, label: '对子', color: 'from-[#2980b9] to-[#1a6da3]', badgeColor: 'bg-[#2980b9]' },
-    { key: 'triplet' as const, label: '豹子', color: 'from-[#e74c3c] to-[#c0392b]', badgeColor: 'bg-[#e74c3c]' },
+    { key: 'six' as const, label: '组六', color: 'from-[#34C759] to-[#248A3D]', badgeColor: 'bg-[#34C759]' },
+    { key: 'pair' as const, label: '对子', color: 'from-[#007AFF] to-[#0056CC]', badgeColor: 'bg-[#007AFF]' },
+    { key: 'triplet' as const, label: '豹子', color: 'from-[#FF3B30] to-[#D70015]', badgeColor: 'bg-[#FF3B30]' },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Layers size={20} className="text-[#0071e3]" />
+        <Layers size={20} className="text-[#1d1d1f]" />
         <div>
           <h2 className="text-lg font-semibold text-[#1d1d1f]">组选走势分布</h2>
-          <p className="text-xs text-[#6e6e73] mt-0.5">近100期组六/对子/豹子分布分析</p>
+          <p className="text-[12px] text-[#8e8e93] mt-0.5">近100期组六/对子/豹子分布分析</p>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-4">
         {groups.map(g => (
-          <div key={g.key} className="bg-white rounded-2xl shadow-apple p-5 text-center">
-            <div className={`w-12 h-12 mx-auto rounded-2xl bg-gradient-to-br ${g.color} flex items-center justify-center mb-3`}>
-              <span className="text-white text-lg font-bold">
+          <div key={g.key} className="bg-white rounded-2xl shadow-card p-5 text-center">
+            <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${g.color} flex items-center justify-center mb-3`}>
+              <span className="text-white text-lg font-semibold">
                 {data.groupCounts[g.key]}
               </span>
             </div>
-            <div className="text-sm font-semibold text-[#1d1d1f]">{g.label}</div>
-            <div className="text-xs text-[#6e6e73] mt-1">
+            <div className="text-[14px] font-semibold text-[#1d1d1f]">{g.label}</div>
+            <div className="text-[12px] text-[#8e8e93] mt-1">
               {((data.groupCounts[g.key] / data.total) * 100).toFixed(1)}% · 遗漏{data.groupMissing[g.key]}期
             </div>
           </div>
@@ -79,8 +79,8 @@ export default function GroupTrendPage() {
       </div>
 
       {/* Pair digit distribution */}
-      <div className="bg-white rounded-2xl shadow-apple p-5">
-        <h3 className="text-sm font-semibold mb-4 text-[#1d1d1f]">对子重复数字分布</h3>
+      <div className="bg-white rounded-2xl shadow-card p-5">
+        <h3 className="text-[14px] font-semibold mb-4 text-[#1d1d1f]">对子重复数字分布</h3>
         <div className="grid grid-cols-5 lg:grid-cols-10 gap-2">
           {Object.entries(data.pairDigits).map(([digit, count]) => {
             const max = Math.max(...Object.values(data.pairDigits));
@@ -88,11 +88,11 @@ export default function GroupTrendPage() {
             return (
               <div key={digit} className="text-center">
                 <div className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center ${
-                  intensity >= 0.7 ? 'bg-[#0071e3] text-white' :
-                  intensity >= 0.4 ? 'bg-[#0071e3]/20 text-[#0071e3]' :
-                  'bg-[#f5f5f7] text-[#6e6e73]'
+                  intensity >= 0.7 ? 'bg-[#007AFF] text-white' :
+                  intensity >= 0.4 ? 'bg-[#007AFF]/15 text-[#007AFF]' :
+                  'bg-[#f5f5f7] text-[#8e8e93]'
                 } transition-colors`}>
-                  <span className="text-lg font-bold">{digit}</span>
+                  <span className="text-lg font-semibold">{digit}</span>
                   <span className="text-[10px] opacity-80">{count}次</span>
                 </div>
               </div>
@@ -102,43 +102,43 @@ export default function GroupTrendPage() {
       </div>
 
       {/* Recent trend table */}
-      <div className="bg-white rounded-2xl shadow-apple p-5">
-        <h3 className="text-sm font-semibold mb-4 text-[#1d1d1f]">近30期组选走势</h3>
+      <div className="bg-white rounded-2xl shadow-card p-5">
+        <h3 className="text-[14px] font-semibold mb-4 text-[#1d1d1f]">近30期组选走势</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#ebebed]">
-                <th className="text-[11px] text-[#6e6e73] font-medium py-2 px-2 text-left">期号</th>
-                <th className="text-[11px] text-[#6e6e73] font-medium py-2 px-2 text-center">号码</th>
-                <th className="text-[11px] text-[#6e6e73] font-medium py-2 px-2 text-center">组六</th>
-                <th className="text-[11px] text-[#6e6e73] font-medium py-2 px-2 text-center">对子</th>
-                <th className="text-[11px] text-[#6e6e73] font-medium py-2 px-2 text-center">豹子</th>
+              <tr className="border-b border-[#e5e5ea]">
+                <th className="text-[11px] text-[#8e8e93] font-medium py-2 px-2 text-left">期号</th>
+                <th className="text-[11px] text-[#8e8e93] font-medium py-2 px-2 text-center">号码</th>
+                <th className="text-[11px] text-[#8e8e93] font-medium py-2 px-2 text-center">组六</th>
+                <th className="text-[11px] text-[#8e8e93] font-medium py-2 px-2 text-center">对子</th>
+                <th className="text-[11px] text-[#8e8e93] font-medium py-2 px-2 text-center">豹子</th>
               </tr>
             </thead>
             <tbody>
               {data.recentTrend.map(row => (
                 <tr key={row.period} className="border-b border-[#f5f5f7] last:border-b-0">
-                  <td className="text-xs text-[#6e6e73] py-2 px-2">{row.period}</td>
-                  <td className="text-xs font-mono font-semibold text-[#1d1d1f] py-2 px-2 text-center">{row.digits}</td>
+                  <td className="text-[12px] text-[#8e8e93] py-2 px-2">{row.period}</td>
+                  <td className="text-[12px] font-mono font-semibold text-[#1d1d1f] py-2 px-2 text-center">{row.digits}</td>
                   <td className="py-2 px-2 text-center">
                     {row.group === 'six' ? (
-                      <span className="inline-block w-6 h-6 rounded-md bg-[#27ae60] text-white text-[11px] font-bold leading-6">✓</span>
+                      <span className="inline-block w-6 h-6 rounded-md bg-[#34C759] text-white text-[11px] font-semibold leading-6">✓</span>
                     ) : (
-                      <span className="text-[#ebebed] text-xs">-</span>
+                      <span className="text-[#e5e5ea] text-[12px]">-</span>
                     )}
                   </td>
                   <td className="py-2 px-2 text-center">
                     {row.group === 'pair' ? (
-                      <span className="inline-block w-6 h-6 rounded-md bg-[#2980b9] text-white text-[11px] font-bold leading-6">✓</span>
+                      <span className="inline-block w-6 h-6 rounded-md bg-[#007AFF] text-white text-[11px] font-semibold leading-6">✓</span>
                     ) : (
-                      <span className="text-[#ebebed] text-xs">-</span>
+                      <span className="text-[#e5e5ea] text-[12px]">-</span>
                     )}
                   </td>
                   <td className="py-2 px-2 text-center">
                     {row.group === 'triplet' ? (
-                      <span className="inline-block w-6 h-6 rounded-md bg-[#e74c3c] text-white text-[11px] font-bold leading-6">✓</span>
+                      <span className="inline-block w-6 h-6 rounded-md bg-[#FF3B30] text-white text-[11px] font-semibold leading-6">✓</span>
                     ) : (
-                      <span className="text-[#ebebed] text-xs">-</span>
+                      <span className="text-[#e5e5ea] text-[12px]">-</span>
                     )}
                   </td>
                 </tr>
@@ -150,7 +150,7 @@ export default function GroupTrendPage() {
 
       {/* Disclaimer */}
       <div className="bg-[#f5f5f7] rounded-2xl p-4">
-        <p className="text-xs text-[#6e6e73] leading-relaxed">
+        <p className="text-[12px] text-[#8e8e93] leading-relaxed">
           以上分析仅基于历史数据统计，不构成投注建议。彩票每期开奖均为独立随机事件，历史数据不代表未来结果。请理性购彩，量力而行。
         </p>
       </div>

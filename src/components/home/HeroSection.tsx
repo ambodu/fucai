@@ -2,72 +2,92 @@
 
 import Link from 'next/link';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import FC3DBall from '@/components/lottery/FC3DBall';
+import { formatPeriod } from '@/utils/format';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
   const latest = mockDraws[0];
 
   return (
-    <section className="relative overflow-hidden bg-white">
-      {/* Floating gradient orbs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#0071e3]/5 blur-3xl" />
-      <div className="absolute top-[10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-[#8b5cf6]/5 blur-3xl" />
-      <div className="absolute bottom-[-10%] left-[30%] w-[350px] h-[350px] rounded-full bg-[#ec4899]/5 blur-3xl" />
-
-      <div className="relative max-w-[1200px] mx-auto px-5 lg:px-6 py-16 lg:py-28 text-center">
-        {/* Status badge */}
-        {latest && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f5f5f7] mb-6 lg:mb-8 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-            <span className="text-xs text-[#6e6e73]">数据已更新至第 {latest.period} 期</span>
-          </div>
-        )}
-
-        {/* Main headline */}
-        <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-5 lg:mb-6 animate-fade-in-up">
-          <span className="bg-gradient-to-r from-[#0071e3] via-[#8b5cf6] to-[#ec4899] bg-clip-text text-transparent">
-            AI 驱动的
-          </span>
-          <br />
-          <span className="text-[#1d1d1f]">彩票数据分析平台</span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-base lg:text-xl text-[#6e6e73] max-w-2xl mx-auto mb-8 lg:mb-10 animate-fade-in-up font-normal leading-relaxed px-2">
-          基于15,000+期历史数据与人工智能技术，为您提供专业的号码走势分析、智能预测参考与数据可视化服务
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 lg:mb-16 animate-fade-in-up px-4">
-          <Link
-            href="/ai"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0071e3] text-white rounded-full px-8 py-3.5 text-base font-medium shadow-apple hover:bg-[#0077ed] transition-all hover:shadow-apple-lg active:scale-[0.98]"
-          >
-            <Sparkles size={18} />
-            开始 AI 分析
-          </Link>
-          <Link
-            href="/trend"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#f5f5f7] text-[#1d1d1f] rounded-full px-8 py-3.5 text-base font-medium hover:bg-[#ebebed] transition-colors active:scale-[0.98]"
-          >
-            浏览走势图
-            <ArrowRight size={16} />
-          </Link>
+    <section className="bg-white">
+      <div className="max-w-[980px] mx-auto px-4 lg:px-6 py-12 lg:py-20">
+        {/* Mobile header with logo */}
+        <div className="lg:hidden flex items-center gap-2 mb-6">
+          <span className="text-[15px] font-semibold text-[#E13C39]">彩数通</span>
+          <span className="text-[#8e8e93] text-[11px]">福彩3D数据平台</span>
         </div>
 
-        {/* Trust stats */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-6 sm:gap-8 lg:gap-16 animate-fade-in">
-          {[
-            { value: '15,000+', label: '历史数据' },
-            { value: '3秒', label: 'AI分析速度' },
-            { value: '100%', label: '官方数据源' },
-            { value: '10+', label: '分析维度' },
-          ].map(stat => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1d1d1f]">{stat.value}</div>
-              <div className="text-xs sm:text-sm text-[#6e6e73] mt-1">{stat.label}</div>
+        <div className="text-center">
+          {/* Main headline */}
+          <h1 className="text-[#1d1d1f] text-3xl lg:text-5xl font-semibold tracking-tight mb-4 lg:mb-5">
+            <span className="text-[#E13C39]">福彩3D</span> 智能分析平台
+          </h1>
+          <p className="text-[#8e8e93] text-base lg:text-xl leading-relaxed mb-8 lg:mb-10 max-w-[600px] mx-auto">
+            汇集 {mockDraws.length.toLocaleString()}+ 期历史数据，AI 驱动的专业数据分析工具
+          </p>
+
+          {/* Latest draw card */}
+          {latest && (
+            <div className="inline-block apple-card p-6 lg:p-8 mb-8 lg:mb-10">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] bg-[#f5f5f7] text-[#8e8e93]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+                  最新开奖
+                </span>
+                <span className="text-[#8e8e93] text-[13px]">{formatPeriod(latest.period)}</span>
+                <span className="text-[#8e8e93]/60 text-[12px]">{latest.drawDate}</span>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <FC3DBall digit={latest.digit1} size="lg" />
+                <FC3DBall digit={latest.digit2} size="lg" />
+                <FC3DBall digit={latest.digit3} size="lg" />
+              </div>
+
+              <div className="flex justify-center gap-6 text-[#8e8e93] text-[13px]">
+                <span>和值 <strong className="text-[#1d1d1f]">{latest.sum}</strong></span>
+                <span>跨度 <strong className="text-[#1d1d1f]">{latest.span}</strong></span>
+                <span>{latest.bigSmallPattern}</span>
+                <span>{latest.oddEvenPattern}</span>
+              </div>
             </div>
-          ))}
+          )}
+
+          {/* CTA buttons */}
+          <div className="flex justify-center gap-3 mb-12 lg:mb-16">
+            <Link
+              href="/ai"
+              className="apple-btn gap-1.5"
+            >
+              <Sparkles size={14} />
+              AI 智能分析
+              <ArrowRight size={14} />
+            </Link>
+            <Link
+              href="/trend"
+              className="apple-btn-outline"
+            >
+              走势图表
+            </Link>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-[680px] mx-auto">
+            {[
+              { value: mockDraws.length.toLocaleString(), label: '历史数据', unit: '期' },
+              { value: '3', label: 'AI分析', unit: '秒' },
+              { value: '100%', label: '官方数据源', unit: '' },
+              { value: '10+', label: '分析维度', unit: '' },
+            ].map(stat => (
+              <div key={stat.label} className="text-center">
+                <div className="text-2xl lg:text-3xl font-semibold text-[#1d1d1f]">
+                  {stat.value}<span className="text-[13px] text-[#8e8e93] font-normal ml-0.5">{stat.unit}</span>
+                </div>
+                <div className="text-[13px] text-[#8e8e93] mt-1">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

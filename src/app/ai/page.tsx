@@ -13,22 +13,28 @@ import { useConversations } from '@/hooks/useConversations';
 import { HOT_QUESTIONS, AI_DISCLAIMER_TEXT } from '@/lib/constants';
 import { ChatMessage, ChartData } from '@/types/ai';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
-import { Send, Loader2, Trash2, Sparkles, MessageSquare, Menu, Zap, ShieldCheck, Database } from 'lucide-react';
+import { Send, Loader2, Trash2, Sparkles, MessageSquare, Menu } from 'lucide-react';
 
 const latestPeriod = mockDraws[0]?.period || '---';
 
 function SimpleMarkdown({ content }: { content: string }) {
   const html = useMemo(() => {
-    let result = content;
+    // Escape HTML entities first to prevent XSS
+    let result = content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    // Then apply markdown formatting on the safe string
     result = result.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[#1d1d1f]">$1</strong>');
     result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    result = result.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-[#f5f5f7] rounded text-xs text-[#0071e3]">$1</code>');
-    result = result.replace(/^### (.+)$/gm, '<div class="text-sm font-semibold text-[#1d1d1f] mt-3 mb-1.5">$1</div>');
+    result = result.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-[#f5f5f7] rounded text-[12px] text-[#007AFF]">$1</code>');
+    result = result.replace(/^### (.+)$/gm, '<div class="text-[14px] font-semibold text-[#1d1d1f] mt-3 mb-1.5">$1</div>');
     result = result.replace(/^## (.+)$/gm, '<div class="text-base font-semibold text-[#1d1d1f] mt-4 mb-2">$1</div>');
-    result = result.replace(/^- (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#6e6e73] shrink-0">•</span><span>$1</span></div>');
-    result = result.replace(/^(\d+)\. (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#6e6e73] shrink-0">$1.</span><span>$2</span></div>');
-    result = result.replace(/^---$/gm, '<hr class="border-[#ebebed] my-3">');
-    result = result.replace(/\n\n/g, '</p><p class="mt-2.5">');
+    result = result.replace(/^- (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#8e8e93] shrink-0">•</span><span>$1</span></div>');
+    result = result.replace(/^(\d+)\. (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#8e8e93] shrink-0">$1.</span><span>$2</span></div>');
+    result = result.replace(/^---$/gm, '<hr class="border-[#e5e5ea] my-3">');
+    result = result.replace(/\n\n/g, '</p><p class="mt-2">');
     result = result.replace(/\n/g, '<br>');
     return `<p>${result}</p>`;
   }, [content]);
@@ -63,7 +69,6 @@ function AIPageContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeMessages]);
 
-  // Auto-create first conversation
   useEffect(() => {
     if (initialized && conversations.length === 0 && !activeConversationId) {
       createConversation();
@@ -74,7 +79,6 @@ function AIPageContent() {
     const text = question || input.trim();
     if (!text || isLoading) return;
 
-    // Ensure we have an active conversation
     if (!activeConversationId) {
       createConversation();
     }
@@ -108,7 +112,7 @@ function AIPageContent() {
       const aiMsg: ChatMessage = {
         id: String(Date.now() + 1),
         role: 'assistant',
-        content: data.content || data.error || '',
+        content: data.content || '',
         timestamp: Date.now(),
         disclaimer: true,
         serverCharts: {
@@ -132,9 +136,6 @@ function AIPageContent() {
     }
   }, [input, isLoading, activeMessages, activeConversationId, addMessage, createConversation]);
 
-  // Auto-ask from URL query parameter (e.g., /ai?q=xxx)
-  // Uses a ref to fire only once, and directly performs the send logic
-  // to avoid stale closure issues with handleSend
   useEffect(() => {
     if (autoAskFired.current) return;
     if (!initialized || !activeConversationId) return;
@@ -145,7 +146,6 @@ function AIPageContent() {
     autoAskFired.current = true;
     const text = question.trim();
 
-    // Perform the send directly to avoid closure issues
     const userMsg: ChatMessage = {
       id: String(Date.now()),
       role: 'user',
@@ -170,7 +170,7 @@ function AIPageContent() {
         const aiMsg: ChatMessage = {
           id: String(Date.now() + 1),
           role: 'assistant',
-          content: data.content || data.error || '',
+          content: data.content || '',
           timestamp: Date.now(),
           disclaimer: true,
           serverCharts: {
@@ -195,18 +195,15 @@ function AIPageContent() {
     })();
   }, [initialized, activeConversationId, searchParams, addMessage]);
 
-  // Flatten all hot questions for the bottom bar quick access
   const allHotQuestions = useMemo(() => {
     return HOT_QUESTIONS.flatMap(cat => cat.questions);
   }, []);
 
   return (
     <div className="h-[100dvh] flex flex-col bg-white">
-      {/* Desktop Navbar */}
       <Navbar />
 
       <div className="flex-1 flex min-h-0">
-        {/* Conversation Sidebar */}
         <ChatSidebar
           conversations={conversations}
           activeId={activeConversationId}
@@ -217,30 +214,29 @@ function AIPageContent() {
           onDelete={deleteConversation}
         />
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           {/* Chat Header */}
-          <div className="glass border-b border-[#ebebed] sticky top-0 lg:top-12 z-30 shrink-0">
-            <div className="max-w-[900px] mx-auto px-3 lg:px-6 py-2 lg:py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2 lg:gap-3">
+          <div className="apple-nav sticky top-0 lg:top-11 z-30 shrink-0">
+            <div className="max-w-[900px] mx-auto px-3 lg:px-6 py-2.5 lg:py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2.5 lg:gap-3">
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden p-1.5 -ml-0.5 rounded-lg text-[#6e6e73] hover:bg-[#f5f5f7] active:bg-[#ebebed] transition-colors"
+                  className="lg:hidden p-1.5 -ml-0.5 rounded-lg text-[#8e8e93] hover:bg-[#f5f5f7] transition-colors"
                 >
                   <Menu size={18} />
                 </button>
-                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg lg:rounded-xl bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] flex items-center justify-center shadow-sm">
-                  <Sparkles size={15} className="text-white lg:hidden" />
-                  <Sparkles size={17} className="text-white hidden lg:block" />
+                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl bg-[#1d1d1f] flex items-center justify-center">
+                  <Sparkles size={14} className="text-white lg:hidden" />
+                  <Sparkles size={16} className="text-white hidden lg:block" />
                 </div>
                 <div>
-                  <h3 className="text-[13px] lg:text-[15px] font-semibold text-[#1d1d1f] leading-tight">AI 智能分析</h3>
-                  <div className="text-[10px] lg:text-[11px] text-[#6e6e73] mt-0.5">数据已更新至第 {latestPeriod} 期</div>
+                  <h3 className="text-[13px] lg:text-[14px] font-semibold text-[#1d1d1f] leading-tight">AI 智能分析</h3>
+                  <div className="text-[11px] lg:text-[12px] text-[#8e8e93] mt-0.5">数据已更新至第 {latestPeriod} 期</div>
                 </div>
               </div>
               <button
                 onClick={clearActiveConversation}
-                className="flex items-center gap-1 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg text-[11px] lg:text-xs text-[#6e6e73] hover:text-red-500 hover:bg-red-50 active:bg-red-100 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 lg:px-3 lg:py-1.5 rounded-full text-[12px] lg:text-[13px] text-[#8e8e93] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-colors"
               >
                 <Trash2 size={13} />
                 <span className="hidden sm:inline">清空</span>
@@ -251,45 +247,20 @@ function AIPageContent() {
           {/* Scrollable content area */}
           <div className="flex-1 overflow-y-auto overscroll-contain">
             {isEmpty ? (
-              /* Empty state: compact hero + hot questions */
               <div className="flex flex-col min-h-full">
-                {/* Hero section - compact on mobile */}
-                <div className="relative flex flex-col items-center justify-center px-4 pt-5 pb-4 lg:pt-10 lg:pb-8">
-                  {/* Background gradient */}
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-[-30%] left-[-20%] w-[300px] h-[300px] rounded-full bg-[#0071e3]/[0.04] blur-3xl" />
-                    <div className="absolute top-[10%] right-[-15%] w-[250px] h-[250px] rounded-full bg-[#8b5cf6]/[0.04] blur-3xl" />
-                  </div>
-
-                  <div className="relative z-10 text-center max-w-lg mx-auto">
-                    {/* AI Icon */}
-                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] flex items-center justify-center mx-auto mb-3 lg:mb-4 shadow-lg shadow-[#0071e3]/20">
-                      <Sparkles size={22} className="text-white lg:hidden" />
+                {/* Hero section */}
+                <div className="flex flex-col items-center justify-center px-4 pt-8 pb-6 lg:pt-12 lg:pb-8">
+                  <div className="text-center max-w-lg mx-auto">
+                    <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-[#1d1d1f] flex items-center justify-center mx-auto mb-4">
+                      <Sparkles size={24} className="text-white lg:hidden" />
                       <Sparkles size={28} className="text-white hidden lg:block" />
                     </div>
-
-                    <h2 className="text-lg lg:text-xl font-bold text-[#1d1d1f] mb-1 lg:mb-2 tracking-tight">
+                    <h2 className="text-lg lg:text-xl font-semibold text-[#1d1d1f] mb-1.5">
                       AI 智能选号助手
                     </h2>
-                    <p className="text-xs lg:text-sm text-[#6e6e73] leading-relaxed mb-3 lg:mb-5">
+                    <p className="text-[13px] lg:text-[14px] text-[#8e8e93] leading-relaxed mb-5">
                       基于 {mockDraws.length.toLocaleString()}+ 期历史数据，为你提供专业的智能分析建议
                     </p>
-
-                    {/* Trust indicators */}
-                    <div className="flex items-center justify-center gap-3 lg:gap-5 mb-3 lg:mb-5">
-                      <div className="flex items-center gap-1 text-[11px] text-[#6e6e73]">
-                        <Zap size={12} className="text-[#0071e3]" />
-                        <span>秒级响应</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-[11px] text-[#6e6e73]">
-                        <Database size={12} className="text-[#0071e3]" />
-                        <span>官方数据</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-[11px] text-[#6e6e73]">
-                        <ShieldCheck size={12} className="text-[#0071e3]" />
-                        <span>多维分析</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -299,11 +270,10 @@ function AIPageContent() {
                 </div>
               </div>
             ) : (
-              /* Messages */
-              <div className="px-3 py-3 max-w-[900px] mx-auto w-full lg:px-6 lg:py-4">
+              <div className="px-3 py-4 max-w-[900px] mx-auto w-full lg:px-6 lg:py-5">
                 {/* Disclaimer */}
-                <div className="p-2.5 bg-[#f5f5f7] rounded-xl mb-3">
-                  <p className="text-[10px] lg:text-[11px] text-[#6e6e73] leading-relaxed">
+                <div className="p-3 bg-[#f5f5f7] rounded-xl mb-4">
+                  <p className="text-[11px] lg:text-[12px] text-[#8e8e93] leading-relaxed">
                     {AI_DISCLAIMER_TEXT}
                   </p>
                 </div>
@@ -311,19 +281,19 @@ function AIPageContent() {
                 {activeMessages.map(msg => (
                   <div
                     key={msg.id}
-                    className={`flex gap-2 lg:gap-3 mb-3 lg:mb-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                    className={`flex gap-2.5 lg:gap-3 mb-4 lg:mb-5 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                   >
-                    <div className={`w-7 h-7 lg:w-8 lg:h-8 rounded-lg lg:rounded-xl shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] font-bold ${
+                    <div className={`w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] font-semibold ${
                       msg.role === 'assistant'
-                        ? 'bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] text-white'
-                        : 'bg-[#f5f5f7] text-[#6e6e73]'
+                        ? 'bg-[#1d1d1f] text-white'
+                        : 'bg-[#f5f5f7] text-[#8e8e93]'
                     }`}>
                       {msg.role === 'assistant' ? 'AI' : 'Me'}
                     </div>
-                    <div className={`px-3 py-2.5 lg:px-4 lg:py-3 rounded-2xl text-[13px] lg:text-sm leading-relaxed max-w-[85%] lg:max-w-[82%] ${
+                    <div className={`px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl text-[13px] lg:text-[14px] leading-relaxed max-w-[85%] lg:max-w-[82%] ${
                       msg.role === 'assistant'
-                        ? 'bg-[#f5f5f7] text-[#1d1d1f] rounded-tl-md'
-                        : 'bg-[#0071e3] text-white rounded-tr-md'
+                        ? 'bg-[#f5f5f7] text-[#1d1d1f]'
+                        : 'bg-[#1d1d1f] text-white'
                     }`}>
                       {msg.role === 'assistant' ? (
                         <>
@@ -346,7 +316,7 @@ function AIPageContent() {
                         <div className="whitespace-pre-wrap">{msg.content}</div>
                       )}
                       {msg.disclaimer && (
-                        <div className="text-[10px] text-[#6e6e73]/60 mt-2 lg:mt-3 pt-2 lg:pt-2.5 border-t border-[#ebebed] leading-relaxed">
+                        <div className="text-[10px] text-[#8e8e93]/60 mt-2.5 lg:mt-3 pt-2.5 lg:pt-3 border-t border-[#e5e5ea] leading-relaxed">
                           {AI_DISCLAIMER_TEXT}
                         </div>
                       )}
@@ -354,11 +324,11 @@ function AIPageContent() {
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="flex gap-2 lg:gap-3 mb-3 lg:mb-4">
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg lg:rounded-xl shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] text-white font-bold">
+                  <div className="flex gap-2.5 lg:gap-3 mb-4 lg:mb-5">
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-[#1d1d1f] text-white font-semibold">
                       AI
                     </div>
-                    <div className="px-3 py-2.5 lg:px-4 lg:py-3 rounded-2xl rounded-tl-md bg-[#f5f5f7] text-[13px] lg:text-sm text-[#6e6e73]">
+                    <div className="px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl bg-[#f5f5f7] text-[13px] lg:text-[14px] text-[#8e8e93]">
                       <Loader2 size={14} className="animate-spin inline mr-1.5" />
                       正在分析数据...
                     </div>
@@ -370,17 +340,16 @@ function AIPageContent() {
           </div>
 
           {/* Bottom bar: hot questions + input */}
-          <div className="shrink-0 border-t border-[#ebebed] bg-white/95 backdrop-blur-sm pb-[calc(env(safe-area-inset-bottom)+60px)] lg:pb-2">
-            {/* Hot questions quick access (when in conversation) */}
+          <div className="shrink-0 border-t border-[#e5e5ea] bg-white pb-[calc(env(safe-area-inset-bottom)+52px)] lg:pb-2">
             {!isEmpty && (
               <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 pt-2 pb-0.5 overflow-x-auto scrollbar-hidden">
-                <div className="flex gap-1.5 w-max">
+                <div className="flex gap-2 w-max">
                   {allHotQuestions.slice(0, 10).map(q => (
                     <button
                       key={q.id}
                       onClick={() => handleSend(q.question)}
                       disabled={isLoading}
-                      className="px-2.5 py-1 rounded-full text-[11px] text-[#6e6e73] bg-[#f5f5f7] border border-[#ebebed] hover:bg-[#0071e3]/8 hover:text-[#0071e3] hover:border-[#0071e3]/20 active:scale-95 transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-0.5"
+                      className="px-3 py-1.5 rounded-full text-[12px] text-[#1d1d1f] bg-[#f5f5f7] hover:bg-[#e5e5ea] transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-1"
                     >
                       <span>{q.icon}</span>
                       {q.label}
@@ -391,23 +360,23 @@ function AIPageContent() {
             )}
 
             {/* Input */}
-            <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 py-2 lg:py-2.5 flex gap-2 items-end">
-              <div className="flex-1 flex items-center bg-[#f5f5f7] border border-[#ebebed] rounded-2xl px-3 py-2.5 lg:px-4 lg:py-3 gap-2 focus-within:border-[#0071e3]/40 focus-within:shadow-sm focus-within:shadow-[#0071e3]/5 transition-all">
-                <MessageSquare size={15} className="text-[#6e6e73]/70 shrink-0" />
+            <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 py-2.5 lg:py-3 flex gap-2 items-end">
+              <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-full px-4 py-2.5 lg:px-5 lg:py-3 gap-2 focus-within:ring-2 focus-within:ring-[#007AFF]/20 transition-all">
+                <MessageSquare size={14} className="text-[#8e8e93]/70 shrink-0" />
                 <input
                   ref={inputRef}
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   disabled={isLoading}
-                  className="flex-1 bg-transparent text-[13px] lg:text-[15px] outline-none placeholder:text-[#6e6e73]/50 text-[#1d1d1f] disabled:opacity-50"
+                  className="flex-1 bg-transparent text-[13px] lg:text-[14px] outline-none placeholder:text-[#8e8e93]/50 text-[#1d1d1f] disabled:opacity-50"
                   placeholder="输入问题，如：下期推荐号码..."
                 />
               </div>
               <button
                 onClick={() => handleSend()}
                 disabled={isLoading || !input.trim()}
-                className="w-10 h-10 lg:w-11 lg:h-11 rounded-2xl bg-[#0071e3] flex items-center justify-center text-white shrink-0 hover:bg-[#0077ed] active:scale-95 transition-all disabled:opacity-30 shadow-sm shadow-[#0071e3]/20"
+                className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-[#1d1d1f] flex items-center justify-center text-white shrink-0 hover:bg-[#424245] transition-all disabled:opacity-30"
               >
                 <Send size={15} />
               </button>
@@ -416,7 +385,6 @@ function AIPageContent() {
         </div>
       </div>
 
-      {/* Mobile Tab Bar */}
       <MobileTabBar />
     </div>
   );

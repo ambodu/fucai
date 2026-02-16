@@ -22,7 +22,7 @@ interface TrendTableProps {
   showStats?: boolean;
 }
 
-const GROUP_LINE_COLORS = ['#e74c3c', '#2980b9', '#27ae60', '#e67e22'];
+const GROUP_LINE_COLORS = ['#007AFF', '#FF3B30', '#34C759', '#FF9500'];
 
 export default function TrendTable({
   periods,
@@ -57,16 +57,16 @@ export default function TrendTable({
   }, [columnGroups, hasGroups]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-apple overflow-hidden">
+    <div className="rounded-2xl shadow-card bg-white overflow-hidden">
       {title && (
-        <div className="px-4 py-3 border-b border-[#ebebed] flex items-center justify-between">
-          <h3 className="text-sm font-bold text-[#1d1d1f]">{title}</h3>
-          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+        <div className="px-4 py-3 border-b border-[#e5e5ea] bg-[#f5f5f7] flex items-center justify-between">
+          <h3 className="text-[14px] font-semibold text-[#1d1d1f]">{title}</h3>
+          <label className="flex items-center gap-1.5 cursor-pointer text-[12px] text-[#8e8e93] hover:text-[#1d1d1f] transition-colors">
             <input
               type="checkbox"
               checked={showLines}
               onChange={e => setShowLines(e.target.checked)}
-              className="w-3.5 h-3.5 rounded accent-[#0071e3]"
+              className="w-3.5 h-3.5 rounded accent-[#007AFF]"
             />
             显示连线
           </label>

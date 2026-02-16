@@ -11,30 +11,33 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 11%;
+    --foreground: 0 0% 7%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 11%;
+    --card-foreground: 0 0% 7%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 11%;
-    --primary: 211 100% 45%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 0 0% 7%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 6% 97%;
-    --secondary-foreground: 0 0% 11%;
-    --muted: 240 6% 97%;
-    --muted-foreground: 0 0% 44%;
-    --accent: 211 100% 45%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 2 74% 55%;
     --accent-foreground: 0 0% 100%;
+    --lottery-red: #E13C39;
+    --lottery-red-dark: #c22d2b;
+    --lottery-red-light: #f05a57;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 93%;
-    --input: 240 6% 93%;
-    --ring: 211 100% 45%;
-    --chart-1: 211 100% 45%;
-    --chart-2: 160 84% 39%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 258 90% 66%;
-    --chart-5: 0 84% 60%;
-    --radius: 1rem;
+    --border: 0 0% 93%;
+    --input: 0 0% 93%;
+    --ring: 210 100% 50%;
+    --chart-1: 210 100% 50%;
+    --chart-2: 0 72% 51%;
+    --chart-3: 145 63% 42%;
+    --chart-4: 33 100% 50%;
+    --chart-5: 262 67% 56%;
+    --radius: 0.75rem;
   }
 }
 
@@ -44,60 +47,147 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+      'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
+    font-size: 15px;
+    color: #1d1d1f;
+    background: #ffffff;
   }
 
-  /* Prevent iOS bounce scroll on fixed layouts */
   html {
     overscroll-behavior: none;
   }
 }
 
-/* Glass morphism utility */
-.glass {
+/* ============================================
+   Apple-style navigation (frosted glass)
+   ============================================ */
+.apple-nav {
   background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* Apple section spacing */
-.section-apple {
-  @apply py-16 lg:py-24;
+/* ============================================
+   Apple-style card (borderless, soft shadow)
+   ============================================ */
+.apple-card {
+  @apply bg-white rounded-2xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
-/* FC3D Ball styles — domain colors preserved */
+.apple-card-hover {
+  @apply bg-white rounded-2xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.apple-card-hover:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   Section title (clean, no left bar)
+   ============================================ */
+.apple-section-title {
+  @apply text-lg font-semibold tracking-tight;
+  color: var(--lottery-red);
+}
+
+/* ============================================
+   Tags / badges (pill shape)
+   ============================================ */
+.apple-tag {
+  @apply inline-flex items-center px-3 py-1 text-xs font-medium rounded-full;
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+
+.apple-tag-accent {
+  @apply inline-flex items-center px-3 py-1 text-xs font-medium rounded-full;
+  background: rgba(0, 122, 255, 0.08);
+  color: #007AFF;
+}
+
+.apple-tag-gold {
+  @apply inline-flex items-center px-3 py-1 text-xs font-medium rounded-full;
+  background: rgba(200, 164, 92, 0.1);
+  color: #ad6800;
+}
+
+/* ============================================
+   Buttons (Apple style)
+   ============================================ */
+.apple-btn {
+  @apply inline-flex items-center justify-center px-7 py-2.5 text-[15px] font-medium text-white rounded-full;
+  background: var(--lottery-red);
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.apple-btn:hover {
+  background: var(--lottery-red-dark);
+}
+.apple-btn:active {
+  background: #a62220;
+}
+
+.apple-btn-outline {
+  @apply inline-flex items-center justify-center px-7 py-2.5 text-[15px] font-medium rounded-full;
+  color: #1d1d1f;
+  border: 1px solid #86868b;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.apple-btn-outline:hover {
+  background: #f5f5f7;
+}
+
+.apple-btn-sm {
+  @apply inline-flex items-center justify-center px-5 py-1.5 text-[13px] font-medium text-white rounded-full;
+  background: var(--lottery-red);
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.apple-btn-sm:hover {
+  background: var(--lottery-red-dark);
+}
+
+/* ============================================
+   FC3D Ball styles (refined Apple gradients)
+   ============================================ */
 .ball {
-  @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0;
+  @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white shrink-0;
 }
 
 .ball-lg {
-  @apply w-12 h-12 text-lg;
+  @apply w-14 h-14 text-xl;
 }
 
 .ball-sm {
-  @apply w-7 h-7 text-xs;
+  @apply w-8 h-8 text-xs;
 }
 
 .ball-red {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+  background: linear-gradient(145deg, #ff4d4d, #cc0000);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(204, 0, 0, 0.2);
 }
 
 .ball-blue {
-  background: linear-gradient(135deg, #2980b9, #1a6da3);
-  box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3);
+  background: linear-gradient(145deg, #38bdf8, #0891b2);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(8, 145, 178, 0.2);
 }
 
 .ball-purple {
-  background: linear-gradient(135deg, #0071e3, #8b5cf6);
-  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.3);
+  background: linear-gradient(145deg, #a78bfa, #7c3aed);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(124, 58, 237, 0.2);
 }
 
-/* Hide scrollbar utility */
+/* ============================================
+   Hide scrollbar utility
+   ============================================ */
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
@@ -106,25 +196,29 @@
   scrollbar-width: none;
 }
 
-/* Trend Table styles — Apple refined */
+/* ============================================
+   Trend Table (Apple minimal style)
+   ============================================ */
 .trend-table {
   @apply w-full border-collapse text-xs;
 }
 .trend-table th {
-  @apply sticky top-0 border px-1 py-2 text-center font-semibold text-[#6e6e73] z-10;
+  @apply sticky top-0 px-1 py-2 text-center font-medium z-10 text-xs uppercase tracking-wider;
   background-color: #f5f5f7;
-  border-color: #ebebed;
+  border-bottom: 1px solid #e5e5ea;
+  color: #8e8e93;
   min-width: 32px;
 }
 .trend-table td {
   @apply px-0.5 py-1 text-center;
-  border: 1px solid #ebebed;
+  border-bottom: 1px solid #f2f2f7;
   min-width: 32px;
   height: 32px;
 }
 .trend-table .period-col {
-  @apply sticky left-0 z-20 font-medium text-[#1d1d1f] text-[11px];
+  @apply sticky left-0 z-20 font-medium text-xs;
   background-color: #ffffff;
+  color: #1d1d1f;
   min-width: 52px;
 }
 .trend-table thead th.period-col {
@@ -132,24 +226,130 @@
   background-color: #f5f5f7;
 }
 .trend-table .position-header {
-  @apply font-bold text-[11px];
-  background-color: rgba(0, 113, 227, 0.06);
-  color: #0071e3;
+  @apply font-semibold text-xs;
+  background-color: rgba(0, 122, 255, 0.05);
+  color: #007AFF;
 }
 .trend-table .extra-col {
-  @apply text-[#6e6e73] font-semibold text-[11px];
+  @apply font-medium text-xs;
   background-color: #f5f5f7;
+  color: #8e8e93;
   min-width: 40px;
 }
 .trend-table .extra-col-value {
-  @apply text-[11px] font-semibold;
-  color: #0071e3;
-  background-color: rgba(0, 113, 227, 0.03);
+  @apply text-xs font-semibold;
+  color: #007AFF;
+  background-color: rgba(0, 122, 255, 0.03);
 }
 .trend-stats-row td {
-  @apply font-semibold text-[#6e6e73];
+  @apply font-medium;
+  color: #8e8e93;
   background-color: #f5f5f7;
 }
 .trend-table tbody tr:nth-child(5n) {
-  border-bottom: 2px solid #d1d5db;
+  border-bottom: 2px solid #e5e5ea;
+}
+
+/* ============================================
+   Data table (Apple clean style)
+   ============================================ */
+.apple-table {
+  @apply w-full text-sm;
+  border-collapse: collapse;
+}
+.apple-table th {
+  @apply px-3 py-2 text-left text-xs font-medium uppercase tracking-wider;
+  border-bottom: 1px solid #e5e5ea;
+  color: #8e8e93;
+}
+.apple-table td {
+  @apply px-3 py-2.5;
+  border-bottom: 1px solid #f2f2f7;
+  color: #1d1d1f;
+}
+.apple-table tbody tr:hover {
+  background: #f5f5f7;
+}
+
+/* ============================================
+   Glass morphism (Apple-grade)
+   ============================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* ============================================
+   Legacy compatibility aliases
+   (Allow gradual migration — these map old names to new styles)
+   ============================================ */
+.gov-header {
+  background: linear-gradient(180deg, #c22d2b, #E13C39);
+}
+.gov-card {
+  @apply bg-white rounded-2xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+.gov-card-bordered {
+  @apply bg-white rounded-2xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border-top: 3px solid var(--lottery-red);
+}
+.gov-section-title {
+  @apply relative pl-3 text-base font-semibold;
+  color: var(--lottery-red);
+}
+.gov-section-title::before {
+  content: '';
+  @apply absolute left-0 top-0.5 bottom-0.5 w-1 rounded-sm;
+  background: var(--lottery-red);
+}
+.gov-tag {
+  @apply inline-flex items-center px-3 py-1 text-xs font-medium rounded-full;
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+.gov-tag-gold {
+  @apply inline-flex items-center px-3 py-1 text-xs font-medium rounded-full;
+  background: rgba(200, 164, 92, 0.1);
+  color: #ad6800;
+}
+.gov-btn-primary {
+  @apply inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium text-white rounded-full;
+  background: var(--lottery-red);
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.gov-btn-primary:hover {
+  background: var(--lottery-red-dark);
+}
+.gov-btn-primary:active {
+  background: #a62220;
+}
+.gov-btn-outline {
+  @apply inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-full;
+  color: #1d1d1f;
+  border: 1px solid #86868b;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.gov-btn-outline:hover {
+  background: #f5f5f7;
+}
+.gov-table {
+  @apply w-full text-sm;
+  border-collapse: collapse;
+}
+.gov-table th {
+  @apply px-3 py-2 text-left text-xs font-medium uppercase tracking-wider;
+  border-bottom: 1px solid #e5e5ea;
+  color: #8e8e93;
+}
+.gov-table td {
+  @apply px-3 py-2.5;
+  border-bottom: 1px solid #f2f2f7;
+  color: #1d1d1f;
+}
+.gov-table tbody tr:hover {
+  background: #f5f5f7;
 }

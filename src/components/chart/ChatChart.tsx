@@ -63,7 +63,7 @@ function buildOption(chart: ChartData): echarts.EChartsCoreOption {
           },
           label: {
             show: true,
-            color: '#6e6e73',
+            color: '#8e8e93',
             fontSize: 11,
           },
           data: xAxis
@@ -99,10 +99,10 @@ function buildOption(chart: ChartData): echarts.EChartsCoreOption {
       radar: {
         indicator: (xAxis || []).map(name => ({ name, max: Math.ceil(maxVal * 1.2) })),
         shape: 'polygon',
-        axisName: { color: '#6e6e73', fontSize: 11 },
-        splitArea: { areaStyle: { color: ['rgba(0,113,227,0.02)', 'rgba(0,113,227,0.04)'] } },
-        splitLine: { lineStyle: { color: '#ebebed' } },
-        axisLine: { lineStyle: { color: '#ebebed' } },
+        axisName: { color: '#8e8e93', fontSize: 11 },
+        splitArea: { areaStyle: { color: ['rgba(0,122,255,0.02)', 'rgba(0,122,255,0.04)'] } },
+        splitLine: { lineStyle: { color: '#f2f2f7' } },
+        axisLine: { lineStyle: { color: '#e5e5ea' } },
       },
       series: [
         {
@@ -168,7 +168,7 @@ function buildOption(chart: ChartData): echarts.EChartsCoreOption {
             { offset: 0, color },
             { offset: 1, color: `${color}80` },
           ]),
-          borderRadius: [3, 3, 0, 0],
+          borderRadius: [4, 4, 0, 0],
         },
       };
     }),
@@ -196,11 +196,11 @@ export default function ChatChart({ chart }: ChatChartProps) {
   return (
     <div className="mt-3">
       {chart.title && (
-        <h5 className="text-xs font-semibold text-[#1d1d1f] mb-1.5">{chart.title}</h5>
+        <h5 className="text-[13px] font-semibold text-[#1d1d1f] mb-1.5">{chart.title}</h5>
       )}
       <div
         ref={chartRef}
-        className="w-full h-[260px] bg-white shadow-apple-sm rounded-2xl p-3"
+        className="w-full h-[260px] bg-white rounded-2xl p-3"
       />
     </div>
   );

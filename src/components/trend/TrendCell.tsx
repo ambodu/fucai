@@ -13,11 +13,11 @@ interface TrendCellProps {
 
 const TrendCell = React.memo(function TrendCell({ value, isHit, missingCount, rowIndex, colIndex, groupColor }: TrendCellProps) {
   if (isHit) {
-    const bgColor = groupColor || '#e74c3c';
+    const bgColor = groupColor || '#007AFF';
     return (
       <div className="flex items-center justify-center">
         <div
-          className="w-[26px] h-[26px] rounded-full text-white flex items-center justify-center text-[11px] font-bold leading-none relative z-[5]"
+          className="w-[26px] h-[26px] rounded-full text-white flex items-center justify-center text-[11px] font-semibold leading-none relative z-[5]"
           style={{ backgroundColor: bgColor }}
           data-hit="true"
           data-row={rowIndex}
@@ -29,7 +29,7 @@ const TrendCell = React.memo(function TrendCell({ value, isHit, missingCount, ro
     );
   }
   return (
-    <div className="flex items-center justify-center text-[#aeaeb2] text-[11px]">
+    <div className="flex items-center justify-center text-[#c7c7cc] text-[11px]">
       {missingCount}
     </div>
   );
