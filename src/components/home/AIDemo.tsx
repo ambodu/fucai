@@ -78,7 +78,7 @@ export default function AIDemo() {
       {/* Section header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="apple-section-title">AI 智能分析</h2>
-        <Link href="/ai" className="text-[13px] text-[#06c] hover:underline font-medium">
+        <Link href="/ai" className="text-[13px] text-[#E13C39] hover:underline font-medium">
           进入完整对话 &rsaquo;
         </Link>
       </div>
@@ -100,7 +100,7 @@ export default function AIDemo() {
               </div>
               <Link
                 href="/ai"
-                className="flex items-center gap-1 text-[12px] text-[#06c] font-medium hover:underline"
+                className="flex items-center gap-1 text-[12px] text-[#E13C39] font-medium hover:underline"
               >
                 完整对话 <ArrowRight size={11} />
               </Link>

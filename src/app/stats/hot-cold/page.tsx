@@ -57,7 +57,7 @@ export default function HotColdPage() {
       <div className="flex items-center gap-2">
         <Flame size={20} className="text-[#FF3B30]" />
         <div>
-          <h2 className="text-lg font-semibold text-[#1d1d1f]">冷热号码分析</h2>
+          <h2 className="text-lg font-semibold text-[#E13C39]">冷热号码分析</h2>
           <p className="text-[12px] text-[#8e8e93] mt-0.5">近50期号码出现频率热力图 + 冷热排行</p>
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function TensPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#1d1d1f]">十位走势图</h2>
+        <h2 className="text-lg font-semibold text-[#E13C39]">十位走势图</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
       <TrendTable

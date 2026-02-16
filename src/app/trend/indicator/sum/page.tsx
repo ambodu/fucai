@@ -22,7 +22,7 @@ export default function SumTrendPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#1d1d1f]">和值分布图</h2>
+        <h2 className="text-lg font-semibold text-[#E13C39]">和值分布图</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
       <div className="text-xs text-[#8e8e93]">和值 = 百位 + 十位 + 个位，范围 0-27</div>

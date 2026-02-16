@@ -81,7 +81,7 @@ export default function MissingStatsPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-[#1d1d1f]">遗漏统计</h2>
+      <h2 className="text-lg font-semibold text-[#E13C39]">遗漏统计</h2>
       <p className="text-[12px] text-[#8e8e93]">点击表头可排序，查看各位置各数字的遗漏情况</p>
 
       <div className="rounded-2xl shadow-card bg-white overflow-hidden">

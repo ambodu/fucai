@@ -30,7 +30,7 @@ export default function Road012Page() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#1d1d1f]">012路走势</h2>
+        <h2 className="text-lg font-semibold text-[#E13C39]">012路走势</h2>
         <PeriodSelector value={periodCount} onChange={setPeriodCount} />
       </div>
       <div className="text-xs text-[#8e8e93]">规则：数字除以3的余数，0路(0,3,6,9)、1路(1,4,7)、2路(2,5,8)</div>

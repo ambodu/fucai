@@ -56,7 +56,7 @@ export default function FrequencyPage() {
       <div className="flex items-center gap-2">
         <BarChart3 size={20} className="text-[#007AFF]" />
         <div>
-          <h2 className="text-lg font-semibold text-[#1d1d1f]">号码频率统计</h2>
+          <h2 className="text-lg font-semibold text-[#E13C39]">号码频率统计</h2>
           <p className="text-[12px] text-[#8e8e93] mt-0.5">近50期各位置数字出现频率分析</p>
         </div>
       </div>

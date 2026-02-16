@@ -14,7 +14,7 @@ export default function PredictionPage() {
       <div className="flex items-center gap-2">
         <Brain size={20} className="text-[#AF52DE]" />
         <div>
-          <h2 className="text-lg font-semibold text-[#1d1d1f]">智能预测分析</h2>
+          <h2 className="text-lg font-semibold text-[#E13C39]">智能预测分析</h2>
           <p className="text-[12px] text-[#8e8e93] mt-0.5">基于近50期数据统计分析，仅供参考</p>
         </div>
       </div>

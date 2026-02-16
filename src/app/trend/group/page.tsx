@@ -56,7 +56,7 @@ export default function GroupTrendPage() {
       <div className="flex items-center gap-2">
         <Layers size={20} className="text-[#1d1d1f]" />
         <div>
-          <h2 className="text-lg font-semibold text-[#1d1d1f]">组选走势分布</h2>
+          <h2 className="text-lg font-semibold text-[#E13C39]">组选走势分布</h2>
           <p className="text-[12px] text-[#8e8e93] mt-0.5">近100期组六/对子/豹子分布分析</p>
         </div>
       </div>
