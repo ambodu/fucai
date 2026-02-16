@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { aiConfig } from '@/lib/config';
 import { getRecentDraws } from '@/lib/data-loader';
 import { getFullHistory } from '@/lib/data-loader-server';
+import { detectQueryType, buildChartData } from '@/lib/chart-builder';
 
 // --- Data context builder ---
+
+function getDigit(draw: { digit1: number; digit2: number; digit3: number }, pos: number): number {
+  return pos === 1 ? draw.digit1 : pos === 2 ? draw.digit2 : draw.digit3;
+}
+
+function posLabel(pos: number): string {
+  return pos === 1 ? '百位' : pos === 2 ? '十位' : '个位';
+}
 
 function buildDataContext(): string {
   const recent = getRecentDraws(100);
@@ -13,147 +22,279 @@ function buildDataContext(): string {
   if (!latest) return '暂无开奖数据。';
 
   const lines: string[] = [];
+  const r50 = recent.slice(0, Math.min(50, recent.length));
+  const r30 = recent.slice(0, Math.min(30, recent.length));
+  const r10 = recent.slice(0, Math.min(10, recent.length));
+
+  // === 基础信息 ===
+  lines.push(`=== 基础信息 ===`);
   lines.push(`数据范围: 共 ${full.length} 期历史数据`);
   lines.push(`最新一期: 第${latest.period}期 (${latest.drawDate}), 开奖号码: ${latest.digit1} ${latest.digit2} ${latest.digit3}`);
-  lines.push(`和值=${latest.sum}, 跨度=${latest.span}, 大小=${latest.bigSmallPattern}, 奇偶=${latest.oddEvenPattern}`);
+  lines.push(`和值=${latest.sum}, 跨度=${latest.span}, 和尾=${latest.sumTail}, 大小=${latest.bigSmallPattern}, 奇偶=${latest.oddEvenPattern}, 质合=${latest.primeCompositePattern}, 012路=${latest.road012.join('')}`);
+  lines.push(`组态=${latest.group === 'triplet' ? '豹子' : latest.group === 'pair' ? '对子' : '组六'}`);
   lines.push('');
 
-  // Recent 10 draws
-  lines.push('最近10期开奖:');
-  recent.slice(0, 10).forEach(d => {
-    lines.push(`  ${d.period} (${d.drawDate}): ${d.digit1} ${d.digit2} ${d.digit3} | 和值=${d.sum} 跨度=${d.span} ${d.bigSmallPattern} ${d.oddEvenPattern} ${d.group === 'triplet' ? '[豹子]' : d.group === 'pair' ? '[对子]' : ''}`);
+  // === 最近15期明细 ===
+  lines.push('=== 最近15期开奖明细 ===');
+  recent.slice(0, 15).forEach(d => {
+    lines.push(`  ${d.period}: ${d.digit1}${d.digit2}${d.digit3} | 和=${d.sum} 跨=${d.span} 和尾=${d.sumTail} ${d.bigSmallPattern} ${d.oddEvenPattern} ${d.primeCompositePattern} 012路=${d.road012.join('')} ${d.group === 'triplet' ? '[豹子]' : d.group === 'pair' ? '[对子]' : ''}`);
   });
   lines.push('');
 
-  // Frequency stats (recent 50)
-  const r50 = recent.slice(0, Math.min(50, recent.length));
-  lines.push('最近50期各位置数字频率:');
+  // === 各位频率分析 (近50期) ===
+  lines.push('=== 各位频率分析 (近50期) ===');
   for (let pos = 1; pos <= 3; pos++) {
-    const posLabel = pos === 1 ? '百位' : pos === 2 ? '十位' : '个位';
     const freq: Record<number, number> = {};
     for (let d = 0; d <= 9; d++) freq[d] = 0;
-    r50.forEach(draw => {
-      const digit = pos === 1 ? draw.digit1 : pos === 2 ? draw.digit2 : draw.digit3;
-      freq[digit]++;
-    });
+    r50.forEach(draw => freq[getDigit(draw, pos)]++);
     const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a);
-    lines.push(`  ${posLabel}: ` + sorted.map(([d, c]) => `${d}(${c}次)`).join(' '));
+    const hotNums = sorted.slice(0, 3).map(([d, c]) => `${d}(${c}次/${(c / 50 * 100).toFixed(0)}%)`).join(', ');
+    const coldNums = sorted.slice(-3).reverse().map(([d, c]) => `${d}(${c}次/${(c / 50 * 100).toFixed(0)}%)`).join(', ');
+    lines.push(`  ${posLabel(pos)}: 热号=[${hotNums}] 冷号=[${coldNums}]`);
+    lines.push(`    全部: ` + sorted.map(([d, c]) => `${d}(${c})`).join(' '));
   }
   lines.push('');
 
-  // Missing values (current)
-  lines.push('当前遗漏值 (百位/十位/个位各数字距上次出现的期数):');
+  // === 近10期各位频率（短期趋势）===
+  lines.push('=== 近10期各位频率（短期趋势）===');
   for (let pos = 1; pos <= 3; pos++) {
-    const posLabel = pos === 1 ? '百位' : pos === 2 ? '十位' : '个位';
+    const freq: Record<number, number> = {};
+    for (let d = 0; d <= 9; d++) freq[d] = 0;
+    r10.forEach(draw => freq[getDigit(draw, pos)]++);
+    const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a);
+    lines.push(`  ${posLabel(pos)}: ` + sorted.filter(([, c]) => c > 0).map(([d, c]) => `${d}(${c}次)`).join(' ') + ` | 未出: ${sorted.filter(([, c]) => c === 0).map(([d]) => d).join(',')}`);
+  }
+  lines.push('');
+
+  // === 当前遗漏值 ===
+  lines.push('=== 当前遗漏值 ===');
+  for (let pos = 1; pos <= 3; pos++) {
     const missing: Record<number, number> = {};
     for (let d = 0; d <= 9; d++) {
-      const idx = recent.findIndex(draw => {
-        const digit = pos === 1 ? draw.digit1 : pos === 2 ? draw.digit2 : draw.digit3;
-        return digit === d;
-      });
+      const idx = recent.findIndex(draw => getDigit(draw, pos) === d);
       missing[d] = idx === -1 ? recent.length : idx;
     }
     const sorted = Object.entries(missing).sort(([, a], [, b]) => b - a);
-    lines.push(`  ${posLabel}: ` + sorted.map(([d, m]) => `${d}(遗漏${m})`).join(' '));
+    const highMissing = sorted.filter(([, m]) => m >= 8).map(([d, m]) => `${d}(${m}期)`);
+    lines.push(`  ${posLabel(pos)}: ` + sorted.map(([d, m]) => `${d}(${m})`).join(' '));
+    if (highMissing.length > 0) {
+      lines.push(`    ⚠ 高遗漏号码（≥8期）: ${highMissing.join(', ')} → 可能回补`);
+    }
   }
   lines.push('');
 
-  // Sum stats
+  // === 复隔中分析 ===
+  lines.push('=== 复隔中分析（最近一期）===');
+  if (recent.length >= 3) {
+    const prev1 = recent[1]; // 上一期
+    const prev2 = recent[2]; // 上上期
+    const latestDigits = [latest.digit1, latest.digit2, latest.digit3];
+    const prev1Digits = [prev1.digit1, prev1.digit2, prev1.digit3];
+    const prev2Digits = [prev2.digit1, prev2.digit2, prev2.digit3];
+
+    const repeat = latestDigits.filter(d => prev1Digits.includes(d));
+    const skip = latestDigits.filter(d => !prev1Digits.includes(d) && prev2Digits.includes(d));
+    const middle = latestDigits.filter(d => !prev1Digits.includes(d) && !prev2Digits.includes(d));
+    lines.push(`  上期号码: ${prev1.digit1}${prev1.digit2}${prev1.digit3}, 上上期: ${prev2.digit1}${prev2.digit2}${prev2.digit3}`);
+    lines.push(`  最新期复码(重码): [${repeat.join(',')}](${repeat.length}个), 隔码: [${skip.join(',')}](${skip.length}个), 中码: [${middle.join(',')}](${middle.length}个)`);
+
+    // 近10期复隔中比统计
+    const ratios: string[] = [];
+    for (let i = 0; i < Math.min(10, recent.length - 2); i++) {
+      const cur = [recent[i].digit1, recent[i].digit2, recent[i].digit3];
+      const p1 = [recent[i + 1].digit1, recent[i + 1].digit2, recent[i + 1].digit3];
+      const p2 = [recent[i + 2].digit1, recent[i + 2].digit2, recent[i + 2].digit3];
+      const r = cur.filter(d => p1.includes(d)).length;
+      const s = cur.filter(d => !p1.includes(d) && p2.includes(d)).length;
+      const m = 3 - r - s;
+      ratios.push(`${r}:${s}:${m}`);
+    }
+    lines.push(`  近10期复:隔:中比: ${ratios.join(' → ')}`);
+  }
+  lines.push('');
+
+  // === 和值分析 ===
   const sums = r50.map(d => d.sum);
   const avgSum = (sums.reduce((a, b) => a + b, 0) / sums.length).toFixed(1);
-  lines.push(`最近50期和值: 平均=${avgSum}, 最大=${Math.max(...sums)}, 最小=${Math.min(...sums)}`);
+  const sumDist: Record<number, number> = {};
+  sums.forEach(s => sumDist[s] = (sumDist[s] || 0) + 1);
+  const topSums = Object.entries(sumDist).sort(([, a], [, b]) => b - a).slice(0, 5);
+  const recent5Sums = r50.slice(0, 5).map(d => d.sum);
+  lines.push('=== 和值分析 (近50期) ===');
+  lines.push(`  平均=${avgSum}, 最大=${Math.max(...sums)}, 最小=${Math.min(...sums)}`);
+  lines.push(`  高频和值: ${topSums.map(([s, c]) => `${s}(${c}次)`).join(', ')}`);
+  lines.push(`  最近5期和值: ${recent5Sums.join(' → ')} (趋势: ${Number(avgSum) > 13.5 ? '偏大' : '偏小'})`);
 
-  // Span stats
-  const spans = r50.map(d => d.span);
-  const avgSpan = (spans.reduce((a, b) => a + b, 0) / spans.length).toFixed(1);
-  lines.push(`最近50期跨度: 平均=${avgSpan}, 最大=${Math.max(...spans)}, 最小=${Math.min(...spans)}`);
-
-  // Group stats
-  const triplets = r50.filter(d => d.group === 'triplet').length;
-  const pairs = r50.filter(d => d.group === 'pair').length;
-  const sixes = r50.filter(d => d.group === 'six').length;
-  lines.push(`最近50期组选形态: 组六=${sixes}次, 对子=${pairs}次, 豹子=${triplets}次`);
+  // 和尾分析
+  const sumTails = r50.map(d => d.sumTail);
+  const sumTailDist: Record<number, number> = {};
+  sumTails.forEach(t => sumTailDist[t] = (sumTailDist[t] || 0) + 1);
+  const topTails = Object.entries(sumTailDist).sort(([, a], [, b]) => b - a);
+  lines.push(`  和尾分布: ${topTails.map(([t, c]) => `${t}(${c}次)`).join(' ')}`);
+  lines.push(`  最近5期和尾: ${r50.slice(0, 5).map(d => d.sumTail).join(' → ')}`);
   lines.push('');
 
-  // Full history stats for deep queries
-  const fullTriplets = full.filter(d => d.group === 'triplet');
-  lines.push(`全部历史豹子: ${fullTriplets.length}次`);
-  if (fullTriplets.length > 0) {
-    lines.push(`  最近一次: ${fullTriplets[0].period} (${fullTriplets[0].drawDate}) ${fullTriplets[0].digit1}${fullTriplets[0].digit2}${fullTriplets[0].digit3}`);
+  // === 跨度分析 ===
+  const spans = r50.map(d => d.span);
+  const avgSpan = (spans.reduce((a, b) => a + b, 0) / spans.length).toFixed(1);
+  const spanDist: Record<number, number> = {};
+  spans.forEach(s => spanDist[s] = (spanDist[s] || 0) + 1);
+  const topSpans = Object.entries(spanDist).sort(([, a], [, b]) => b - a).slice(0, 5);
+  lines.push('=== 跨度分析 (近50期) ===');
+  lines.push(`  平均=${avgSpan}, 最大=${Math.max(...spans)}, 最小=${Math.min(...spans)}`);
+  lines.push(`  高频跨度: ${topSpans.map(([s, c]) => `${s}(${c}次)`).join(', ')}`);
+  lines.push(`  最近5期跨度: ${r50.slice(0, 5).map(d => d.span).join(' → ')}`);
+  lines.push('');
+
+  // === 012路分析 ===
+  lines.push('=== 012路分析 (近50期) ===');
+  lines.push('  0路数字: 0,3,6,9 | 1路数字: 1,4,7 | 2路数字: 2,5,8');
+  for (let pos = 1; pos <= 3; pos++) {
+    const roadCount = [0, 0, 0];
+    r50.forEach(d => roadCount[getDigit(d, pos) % 3]++);
+    lines.push(`  ${posLabel(pos)}: 0路=${roadCount[0]}次(${(roadCount[0] / 50 * 100).toFixed(0)}%) 1路=${roadCount[1]}次(${(roadCount[1] / 50 * 100).toFixed(0)}%) 2路=${roadCount[2]}次(${(roadCount[2] / 50 * 100).toFixed(0)}%)`);
   }
+  lines.push(`  最近5期012路形态: ${r50.slice(0, 5).map(d => d.road012.join('')).join(' → ')}`);
+  lines.push('');
+
+  // === 大小奇偶质合形态 ===
+  lines.push('=== 形态分析 (近50期) ===');
+  const bsCount: Record<string, number> = {};
+  const oeCount: Record<string, number> = {};
+  const pcCount: Record<string, number> = {};
+  r50.forEach(d => {
+    bsCount[d.bigSmallPattern] = (bsCount[d.bigSmallPattern] || 0) + 1;
+    oeCount[d.oddEvenPattern] = (oeCount[d.oddEvenPattern] || 0) + 1;
+    pcCount[d.primeCompositePattern] = (pcCount[d.primeCompositePattern] || 0) + 1;
+  });
+  lines.push(`  大小: ${Object.entries(bsCount).sort(([, a], [, b]) => b - a).map(([p, c]) => `${p}(${c})`).join(' ')}`);
+  lines.push(`  奇偶: ${Object.entries(oeCount).sort(([, a], [, b]) => b - a).map(([p, c]) => `${p}(${c})`).join(' ')}`);
+  lines.push(`  质合: ${Object.entries(pcCount).sort(([, a], [, b]) => b - a).map(([p, c]) => `${p}(${c})`).join(' ')}`);
+  // Big/small ratio
+  const bigCount = r50.reduce((sum, d) => sum + d.bigCount, 0);
+  const smallCount = r50.reduce((sum, d) => sum + d.smallCount, 0);
+  lines.push(`  大小比总计: 大${bigCount}:小${smallCount} (大占比${(bigCount / (bigCount + smallCount) * 100).toFixed(0)}%)`);
+  const oddTotal = r50.reduce((sum, d) => sum + d.oddCount, 0);
+  const evenTotal = r50.reduce((sum, d) => sum + d.evenCount, 0);
+  lines.push(`  奇偶比总计: 奇${oddTotal}:偶${evenTotal} (奇占比${(oddTotal / (oddTotal + evenTotal) * 100).toFixed(0)}%)`);
+  lines.push(`  最近5期大小: ${r50.slice(0, 5).map(d => d.bigSmallPattern).join(' → ')}`);
+  lines.push(`  最近5期奇偶: ${r50.slice(0, 5).map(d => d.oddEvenPattern).join(' → ')}`);
+  lines.push('');
+
+  // === 组选形态 ===
+  const triplets50 = r50.filter(d => d.group === 'triplet').length;
+  const pairs50 = r50.filter(d => d.group === 'pair').length;
+  const sixes50 = r50.filter(d => d.group === 'six').length;
+  lines.push('=== 组选形态 (近50期) ===');
+  lines.push(`  组六=${sixes50}次(${(sixes50 / 50 * 100).toFixed(0)}%), 对子=${pairs50}次(${(pairs50 / 50 * 100).toFixed(0)}%), 豹子=${triplets50}次`);
+
+  // 上次对子和豹子距今
+  const lastPairIdx = recent.findIndex(d => d.group === 'pair');
+  const lastTripletIdx = recent.findIndex(d => d.group === 'triplet');
+  if (lastPairIdx >= 0) lines.push(`  上次对子: ${recent[lastPairIdx].period} (${recent[lastPairIdx].digit1}${recent[lastPairIdx].digit2}${recent[lastPairIdx].digit3}), 距今${lastPairIdx}期`);
+  if (lastTripletIdx >= 0) lines.push(`  上次豹子: ${recent[lastTripletIdx].period} (${recent[lastTripletIdx].digit1}${recent[lastTripletIdx].digit2}${recent[lastTripletIdx].digit3}), 距今${lastTripletIdx}期`);
+  lines.push('');
+
+  // === 号码连续性分析 ===
+  lines.push('=== 号码连续性分析 ===');
+  // 各位置连号分析
+  for (let pos = 1; pos <= 3; pos++) {
+    const streak: number[] = [];
+    let cur = getDigit(recent[0], pos);
+    let count = 1;
+    for (let i = 1; i < Math.min(20, recent.length); i++) {
+      const d = getDigit(recent[i], pos);
+      if (d === cur) { count++; } else { streak.push(count); cur = d; count = 1; }
+    }
+    streak.push(count);
+    const currentDigit = getDigit(recent[0], pos);
+    const currentStreak = streak[0];
+    lines.push(`  ${posLabel(pos)}: 当前数字${currentDigit}已连出${currentStreak}期`);
+  }
+  lines.push('');
+
+  // === 全量历史关键数据 ===
+  const fullTriplets = full.filter(d => d.group === 'triplet');
+  lines.push('=== 全量历史关键数据 ===');
+  lines.push(`  总期数: ${full.length}`);
+  lines.push(`  历史豹子: ${fullTriplets.length}次 (概率${(fullTriplets.length / full.length * 100).toFixed(2)}%)`);
+  if (fullTriplets.length > 0) {
+    lines.push(`  最近豹子: ${fullTriplets.slice(0, 3).map(d => `${d.period}(${d.digit1}${d.digit2}${d.digit3})`).join(', ')}`);
+  }
+  const fullPairs = full.filter(d => d.group === 'pair');
+  lines.push(`  历史对子: ${fullPairs.length}次 (概率${(fullPairs.length / full.length * 100).toFixed(2)}%)`);
 
   return lines.join('\n');
 }
 
 function buildSystemPrompt(dataContext: string): string {
-  return `你是"彩数通"平台的福彩3D智能分析助手。你的职责是基于提供的真实历史开奖数据，回答用户关于福彩3D的数据查询、统计分析和号码参考问题。
+  return `你是"彩数通"平台的福彩3D资深分析师。你拥有深厚的彩票数据统计分析功底，能够基于真实历史数据为彩民提供专业、精确、有据可依的分析建议。
 
 ## 核心原则
-1. 只基于提供的真实数据进行分析，不编造数据
-2. 可以基于历史数据的统计规律给出下一期的号码参考建议
-3. 给出号码建议时，必须说明分析依据（如频率、遗漏、趋势等）
-4. 每次给出参考号码后，必须附带免责提醒
-5. 回答简洁直观，善用数字和列表
+1. **数据驱动**: 所有分析必须引用提供的真实数据，每个结论都要附上具体数字证据（频率、遗漏值、百分比等）
+2. **多维交叉验证**: 推荐号码时从多个维度交叉验证（频率+遗漏+趋势+形态），不能仅凭单一指标
+3. **区分长短期趋势**: 同时参考近10期（短期）和近50期（中期）数据，指出趋势变化
+4. **概率思维**: 明确说明推荐的概率依据，不做绝对化预测
+5. **回答精确简练**: 用数据说话，避免空泛描述，直接给出数字和结论
 
-## 号码参考建议的格式
-当用户询问下期推荐时，按以下格式回答：
-- 百位推荐：列出3-4个候选数字及理由
-- 十位推荐：列出3-4个候选数字及理由
-- 个位推荐：列出3-4个候选数字及理由
-- 和值参考范围
-- 跨度参考范围
-- 形态参考（大小/奇偶）
+## 分析方法论
+
+### 号码推荐逻辑（预测/推荐/下期/建议/选号/胆码）
+分析步骤：
+1. **热号分析**: 近50期高频号码 → 近10期是否仍保持热度
+2. **遗漏回补**: 遗漏≥8期的号码有回补可能，遗漏≥12期重点关注
+3. **趋势判断**: 近5期各位数字的走势方向（升/降/震荡）
+4. **复隔中参考**: 根据近期复隔中比例，判断本期可能的复码/隔码/中码数量
+5. **交叉筛选**: 综合以上维度，给出各位推荐号码（3-4个）
+
+输出格式：
+- 百位推荐: X, X, X（逐个说明理由，引用频率和遗漏数据）
+- 十位推荐: X, X, X（同上）
+- 个位推荐: X, X, X（同上）
+- 和值参考: XX-XX（引用近50期平均值和趋势）
+- 跨度参考: X-X（引用近50期数据）
+- 形态参考: 大小=XXX, 奇偶=XXX（引用高频形态数据）
+
+### 独胆/双胆推荐逻辑
+- **独胆**: 综合所有位置频率最高且遗漏最短的号码，选出最稳定的1个，说明三个位置的具体频率和遗漏数据
+- **双胆**: 一个从热号中选（高频稳定），一个从高遗漏中选（回补预期），分别说明依据
+
+### 杀号逻辑（杀号/杀码/排除）
+- **杀号**: 选择近50期频率最低（≤2次）且近10期完全未出的号码，分各位分析
+- **杀和值**: 排除近50期出现0次或仅1次的和值
+- **杀跨度**: 排除近50期出现次数最少的跨度值（≤2次）
+- 每个杀号结论必须附带具体的频率数据
+
+### 012路分析逻辑
+- 0路数字: 0,3,6,9 | 1路数字: 1,4,7 | 2路数字: 2,5,8
+- 分析各位置012路的50期分布比例
+- 对比近10期和近50期的比例变化
+- 给出下期各位012路形态预测，引用比例数据
+
+### 复隔中分析逻辑
+- 复码(重码): 与上期相同的号码
+- 隔码: 与上上期相同的号码
+- 中码: 既不是复码也不是隔码
+- 分析近10期复隔中比走势
+- 预判下期复隔中比例
+
+### 和值/跨度分析逻辑
+- 展示近50期的平均值、高频值、分布区间
+- 分析近5期走势方向
+- 给出下期参考区间，引用具体数据
+
+## 回答要求
+1. **精准引用**: 每个数据点都要注明来源（如"近50期百位数字3出现8次(16%)"）
+2. **结构清晰**: 使用标题和列表组织内容，重点加粗
+3. **先数据后结论**: 先展示关键数据，再给出推荐结论
+4. **对比说明**: 如果短期和长期趋势有差异，要指出
+5. **回答格式**: 直接返回纯文本或 Markdown，不要返回 JSON，不要用代码块
+
+## 免责提醒（给出号码建议时必须附加）
+⚠️ 以上分析基于历史数据统计规律，仅供参考。彩票每期开奖均为独立随机事件，历史数据不代表未来结果。请理性购彩，量力而行。
 
 ## 当前数据
-${dataContext}
-
-## 回答风格
-- 直接给出数据和统计结果
-- 用数字说话，附带百分比
-- 适当使用表格或列表排版
-- 如果用户的问题超出数据范围，如实说明
-
-## 免责提醒（每次给出号码建议时必须附加）
-以上分析仅基于历史数据统计规律，仅供参考。彩票每期开奖均为独立随机事件，历史数据不能预测未来结果。请理性购彩，量力而行。
-
-## 图表数据模式（必须严格遵守）
-
-你必须返回结构化 JSON，格式如下：
-
-{
-  "text": "你的文字分析内容（支持 Markdown）",
-  "charts": [
-    {
-      "type": "bar",
-      "title": "图表标题",
-      "xAxis": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-      "series": [{ "name": "出现次数", "data": [5, 8, 3, 7, 6, 9, 4, 2, 8, 6] }]
-    }
-  ],
-  "dataCards": [
-    { "label": "平均和值", "value": "13.5", "trend": "up", "sub": "近50期" },
-    { "label": "最大遗漏", "value": "23期", "trend": "down", "sub": "百位数字7" }
-  ]
-}
-
-### 图表类型选择规则：
-- 频率/次数对比 → "bar"（柱状图）
-- 趋势/走势/变化 → "line"（折线图）
-- 占比/分布 → "pie"（饼图）
-- 多维度对比 → "radar"（雷达图）
-
-### 数据卡片（dataCards）
-当回答包含关键指标时，在 JSON 中加入 dataCards 字段。
-trend 取值: "up"(上升/偏高), "down"(下降/偏低), "neutral"(持平)
-dataCards 用于展示关键统计数据，每次回答尽量提供 2-4 个关键指标卡片。
-
-### 严格规则：
-1. 必须返回纯 JSON，不加 markdown 代码块标记
-2. charts 中每个图表的 data 数组长度必须与 xAxis 长度一致
-3. 如果回答不涉及数据图表，charts 为空数组 []
-4. text 字段支持 Markdown 格式
-5. series 中 name 必须有意义（如"百位频率"而不是"数据"）
-6. dataCards 为空时可省略或设为空数组`;
+${dataContext}`;
 }
 
 // --- Provider implementations ---
@@ -245,57 +386,30 @@ async function callGemini(systemPrompt: string, messages: Message[]): Promise<st
   return response.text || '';
 }
 
-// --- Parse AI response ---
+// --- Parse AI response (simplified: just extract text) ---
 
-interface AIResponse {
-  content: string;
-  charts?: Array<{
-    type: 'bar' | 'line' | 'pie' | 'radar' | 'heatmap';
-    title: string;
-    xAxis?: string[];
-    series: Array<{ name: string; data: number[]; color?: string }>;
-  }>;
-  dataCards?: Array<{
-    label: string;
-    value: string;
-    trend?: 'up' | 'down' | 'neutral';
-    sub?: string;
-  }>;
-}
-
-function parseChartResponse(raw: string): AIResponse {
+function parseResponse(raw: string): string {
+  // If AI still returns JSON, extract the text field
   try {
     const parsed = JSON.parse(raw);
-    if (parsed.text !== undefined) {
-      return {
-        content: parsed.text || '',
-        charts: Array.isArray(parsed.charts) ? parsed.charts : [],
-        dataCards: Array.isArray(parsed.dataCards) ? parsed.dataCards : [],
-      };
-    }
+    if (parsed.text) return parsed.text;
   } catch {
-    // Not valid JSON
+    // Not JSON, that's fine
   }
 
-  // Try extracting JSON from markdown code blocks
+  // Try extracting from markdown code blocks
   const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (jsonMatch) {
     try {
       const parsed = JSON.parse(jsonMatch[1].trim());
-      if (parsed.text !== undefined) {
-        return {
-          content: parsed.text || '',
-          charts: Array.isArray(parsed.charts) ? parsed.charts : [],
-          dataCards: Array.isArray(parsed.dataCards) ? parsed.dataCards : [],
-        };
-      }
+      if (parsed.text) return parsed.text;
     } catch {
       // Malformed JSON in code block
     }
   }
 
-  // Fallback: treat entire response as plain text
-  return { content: raw, charts: [], dataCards: [] };
+  // Just return the raw text
+  return raw;
 }
 
 // --- Route handler ---
@@ -329,6 +443,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Detect query type from the latest user message
+  const userMessage = body.messages[body.messages.length - 1]?.content || '';
+  const queryType = detectQueryType(userMessage);
+
+  // Build deterministic chart data from real data (server-side)
+  const recent = getRecentDraws(100);
+  const serverData = buildChartData(queryType, recent);
+
   try {
     const dataContext = buildDataContext();
     const systemPrompt = buildSystemPrompt(dataContext);
@@ -355,8 +477,15 @@ export async function POST(request: NextRequest) {
             break;
         }
 
-        const parsed = parseChartResponse(text);
-        return NextResponse.json(parsed);
+        const content = parseResponse(text);
+
+        return NextResponse.json({
+          content,
+          queryType: serverData.queryType,
+          charts: serverData.charts,
+          dataCards: serverData.dataCards,
+          prediction: serverData.prediction || undefined,
+        });
       } catch (err) {
         lastError = err;
         const status = (err as { status?: number }).status;
@@ -411,7 +540,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Even on AI error, return the server-computed charts
     console.error(`AI API error [${aiConfig.provider}]:`, error instanceof Error ? error.message : error);
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({
+      error: message,
+      queryType: serverData.queryType,
+      charts: serverData.charts,
+      dataCards: serverData.dataCards,
+      prediction: serverData.prediction || undefined,
+    }, { status });
   }
 }

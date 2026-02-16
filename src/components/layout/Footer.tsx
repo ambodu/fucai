@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { APP_NAME, DISCLAIMER_TEXT } from '@/lib/constants';
 
 export default function Footer() {
@@ -17,17 +18,17 @@ export default function Footer() {
             <div>
               <h4 className="text-sm font-semibold mb-3 text-[#1d1d1f]">功能</h4>
               <ul className="space-y-2 text-sm text-[#6e6e73]">
-                <li className="hover:text-[#0071e3] transition-colors cursor-pointer">AI 智能分析</li>
-                <li className="hover:text-[#0071e3] transition-colors cursor-pointer">走势图表</li>
-                <li className="hover:text-[#0071e3] transition-colors cursor-pointer">数据查询</li>
+                <li><Link href="/ai" className="hover:text-[#0071e3] transition-colors">AI 智能分析</Link></li>
+                <li><Link href="/trend" className="hover:text-[#0071e3] transition-colors">走势图表</Link></li>
+                <li><Link href="/data" className="hover:text-[#0071e3] transition-colors">数据查询</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold mb-3 text-[#1d1d1f]">关于</h4>
+              <h4 className="text-sm font-semibold mb-3 text-[#1d1d1f]">更多</h4>
               <ul className="space-y-2 text-sm text-[#6e6e73]">
-                <li className="hover:text-[#0071e3] transition-colors cursor-pointer">使用说明</li>
-                <li className="hover:text-[#0071e3] transition-colors cursor-pointer">隐私政策</li>
-                <li className="hover:text-[#0071e3] transition-colors cursor-pointer">服务条款</li>
+                <li><Link href="/stats" className="hover:text-[#0071e3] transition-colors">统计分析</Link></li>
+                <li><Link href="/stats/frequency" className="hover:text-[#0071e3] transition-colors">号码频率</Link></li>
+                <li><Link href="/stats/hot-cold" className="hover:text-[#0071e3] transition-colors">冷热分析</Link></li>
               </ul>
             </div>
           </div>

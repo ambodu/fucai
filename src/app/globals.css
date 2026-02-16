@@ -47,6 +47,13 @@
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  /* Prevent iOS bounce scroll on fixed layouts */
+  html {
+    overscroll-behavior: none;
   }
 }
 
@@ -83,6 +90,11 @@
 .ball-blue {
   background: linear-gradient(135deg, #2980b9, #1a6da3);
   box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3);
+}
+
+.ball-purple {
+  background: linear-gradient(135deg, #0071e3, #8b5cf6);
+  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.3);
 }
 
 /* Hide scrollbar utility */

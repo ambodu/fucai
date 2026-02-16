@@ -97,7 +97,7 @@ export default function ChatSidebar({ conversations, activeId, isOpen, onClose, 
   return (
     <>
       {/* Desktop sidebar */}
-      <div className="hidden lg:block w-[280px] bg-[#f5f5f7] border-r border-[#ebebed] shrink-0 h-screen sticky top-0">
+      <div className="hidden lg:block w-[280px] bg-[#f5f5f7] border-r border-[#ebebed] shrink-0 h-[calc(100dvh-48px)] sticky top-12">
         <SidebarContent
           conversations={conversations}
           activeId={activeId}

@@ -20,16 +20,16 @@ export default function StatsOverview() {
   });
 
   return (
-    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6">
+    <section className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6 lg:py-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-bold text-[#1d1d1f]">冷热号码速览</h2>
+        <h2 className="text-[17px] font-bold text-[#1d1d1f]">冷热号码速览</h2>
         <span className="text-[11px] text-[#6e6e73]">近50期</span>
       </div>
       <div className="bg-white shadow-apple rounded-2xl overflow-hidden">
         {positionData.map((pos) => (
-          <div key={pos.label} className="flex items-center px-4 py-3 border-b border-[#f5f5f7] last:border-b-0">
-            <div className="w-10 text-xs font-semibold text-[#6e6e73] shrink-0">{pos.label}</div>
-            <div className="flex-1 flex gap-1.5">
+          <div key={pos.label} className="flex items-center px-3 sm:px-4 py-3 border-b border-[#f5f5f7] last:border-b-0">
+            <div className="w-8 sm:w-10 text-xs font-semibold text-[#6e6e73] shrink-0">{pos.label}</div>
+            <div className="flex-1 flex gap-1 sm:gap-1.5 justify-between sm:justify-start">
               {Array.from({ length: 10 }, (_, d) => {
                 const count = pos.freq[d];
                 const isHot = count >= pos.maxCount - 1;
@@ -37,7 +37,7 @@ export default function StatsOverview() {
                 return (
                   <div
                     key={d}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-bold shrink-0 ${
                       isHot
                         ? 'bg-[#e74c3c] text-white'
                         : isCold
@@ -53,10 +53,10 @@ export default function StatsOverview() {
             </div>
           </div>
         ))}
-        <div className="px-4 py-2 bg-[#f5f5f7] flex items-center gap-4 text-[10px] text-[#6e6e73]">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-[#e74c3c] inline-block" /> 热号</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-[#0071e3] inline-block" /> 冷号</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-[#f5f5f7] border border-[#ebebed] inline-block" /> 正常</span>
+        <div className="px-3 sm:px-4 py-2.5 bg-[#f5f5f7] flex items-center gap-4 text-[10px] sm:text-[11px] text-[#6e6e73]">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#e74c3c] inline-block" /> 热号</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#0071e3] inline-block" /> 冷号</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#f5f5f7] border border-[#ebebed] inline-block" /> 正常</span>
         </div>
       </div>
     </section>

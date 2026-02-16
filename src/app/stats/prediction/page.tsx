@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
 import { generatePrediction } from '@/utils/trend-calc';
 import { Brain } from 'lucide-react';
+import FC3DBall from '@/components/lottery/FC3DBall';
 
 export default function PredictionPage() {
   const prediction = useMemo(() => generatePrediction(mockDraws), []);
@@ -37,9 +38,7 @@ export default function PredictionPage() {
               <div className="space-y-1.5">
                 {pos.hotDigits.map(h => (
                   <div key={h.digit} className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#e74c3c] to-[#c0392b] text-white text-xs font-bold flex items-center justify-center">
-                      {h.digit}
-                    </span>
+                    <FC3DBall digit={h.digit} size="sm" variant="red" />
                     <span className="text-xs text-[#6e6e73]">{h.reason}</span>
                   </div>
                 ))}
@@ -52,9 +51,7 @@ export default function PredictionPage() {
               <div className="space-y-1.5">
                 {pos.coldDigits.map(c => (
                   <div key={c.digit} className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0071e3] to-[#0077ed] text-white text-xs font-bold flex items-center justify-center">
-                      {c.digit}
-                    </span>
+                    <FC3DBall digit={c.digit} size="sm" variant="blue" />
                     <span className="text-xs text-[#6e6e73]">{c.reason}</span>
                   </div>
                 ))}
@@ -66,9 +63,7 @@ export default function PredictionPage() {
               <div className="text-[11px] text-[#6e6e73] font-medium mb-2">推荐号码</div>
               <div className="flex gap-2">
                 {pos.recommendedDigits.map(d => (
-                  <span key={d} className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0071e3] to-[#8b5cf6] text-white text-sm font-bold flex items-center justify-center">
-                    {d}
-                  </span>
+                  <FC3DBall key={d} digit={d} size="md" variant="purple" />
                 ))}
               </div>
             </div>

@@ -143,7 +143,7 @@ export default function TrendLines({ containerRef, cellData, columnGroups }: Tre
       className="absolute top-0 left-0 pointer-events-none"
       width={svgSize.width}
       height={svgSize.height}
-      style={{ zIndex: 2 }}
+      style={{ zIndex: 1 }}
     >
       {lines.map((line, i) => (
         <line

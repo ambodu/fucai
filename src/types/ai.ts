@@ -16,6 +16,26 @@ export interface DataCard {
   sub?: string;
 }
 
+export interface PredictionResult {
+  positions: Array<{
+    label: string;
+    recommended: number[];
+    hot: number[];
+    cold: number[];
+    reasons: Record<number, string>;
+  }>;
+  sumRange: { min: number; max: number; avg: number };
+  spanRange: { min: number; max: number; avg: number };
+  patterns: { bigSmall: string[]; oddEven: string[] };
+}
+
+export interface ServerChartData {
+  queryType: string;
+  charts: ChartData[];
+  dataCards: DataCard[];
+  prediction?: PredictionResult;
+}
+
 export interface AIResponse {
   text: string;
   charts: ChartData[];
@@ -30,6 +50,7 @@ export interface ChatMessage {
   disclaimer?: boolean;
   charts?: ChartData[];
   dataCards?: DataCard[];
+  serverCharts?: ServerChartData;
 }
 
 export interface Conversation {

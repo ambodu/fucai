@@ -15,7 +15,7 @@ export const aiConfig = {
   baseUrl: process.env.AI_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode',
   apiKey: process.env.AI_API_KEY || '',
   model: process.env.AI_MODEL || 'qwen-plus',
-  maxTokens: 4096,
+  maxTokens: 8192,
   timeout: 60000,
 };
 
