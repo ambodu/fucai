@@ -24,20 +24,20 @@ export default function HotQuestions({ onSelect, disabled }: HotQuestionsProps) 
   return (
     <div className="w-full max-w-[700px] mx-auto">
       {/* Section title */}
-      <div className="flex items-center justify-between mb-4 px-1">
-        <h3 className="text-[15px] font-semibold text-[#1d1d1f]">热门问题</h3>
-        <span className="text-[11px] text-[#6e6e73]">点击即可提问</span>
+      <div className="flex items-center justify-between mb-2.5 lg:mb-3 px-1">
+        <h3 className="text-[13px] lg:text-[15px] font-semibold text-[#1d1d1f]">热门问题</h3>
+        <span className="text-[10px] lg:text-[11px] text-[#6e6e73]">点击即可提问</span>
       </div>
 
       {/* Category tabs - horizontal scroll on mobile */}
-      <div className="overflow-x-auto scrollbar-hidden mb-4 -mx-1 px-1">
-        <div className="flex gap-2 w-max">
+      <div className="overflow-x-auto scrollbar-hidden mb-2.5 lg:mb-3 -mx-1 px-1">
+        <div className="flex gap-1.5 lg:gap-2 w-max">
           {HOT_QUESTIONS.map(cat => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               disabled={disabled}
-              className={`px-4 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg lg:rounded-xl text-[11px] lg:text-xs font-medium transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-1 lg:gap-1.5 ${
                 activeCategory === cat.id
                   ? 'bg-[#0071e3] text-white shadow-sm shadow-[#0071e3]/20'
                   : 'bg-[#f5f5f7] text-[#6e6e73] hover:bg-[#ebebed] active:scale-95'
@@ -51,20 +51,20 @@ export default function HotQuestions({ onSelect, disabled }: HotQuestionsProps) 
       </div>
 
       {/* Questions grid - responsive */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {currentCategory.questions.map(q => (
           <button
             key={q.id}
             onClick={() => onSelect(q.question)}
             disabled={disabled}
-            className="flex items-center gap-3 px-4 py-3.5 bg-[#f5f5f7] rounded-2xl text-left hover:bg-[#0071e3]/[0.06] border border-transparent hover:border-[#0071e3]/15 active:scale-[0.98] transition-all disabled:opacity-30 group"
+            className="flex items-center gap-2.5 px-3 py-2.5 lg:px-4 lg:py-3.5 bg-[#f5f5f7] rounded-xl lg:rounded-2xl text-left hover:bg-[#0071e3]/[0.06] border border-transparent hover:border-[#0071e3]/15 active:scale-[0.98] transition-all disabled:opacity-30 group"
           >
-            <div className="w-9 h-9 rounded-xl bg-white shadow-apple-sm flex items-center justify-center shrink-0">
-              <span className="text-base">{q.icon}</span>
+            <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg lg:rounded-xl bg-white shadow-apple-sm flex items-center justify-center shrink-0">
+              <span className="text-sm lg:text-base">{q.icon}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-[13px] font-medium text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors block">{q.label}</span>
-              <span className="text-[11px] text-[#6e6e73] line-clamp-1 mt-0.5 block">{q.question}</span>
+              <span className="text-[12px] lg:text-[13px] font-medium text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors block">{q.label}</span>
+              <span className="text-[10px] lg:text-[11px] text-[#6e6e73] line-clamp-1 mt-0.5 block">{q.question}</span>
             </div>
           </button>
         ))}

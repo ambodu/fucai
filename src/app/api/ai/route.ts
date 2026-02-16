@@ -23,7 +23,6 @@ function buildDataContext(): string {
 
   const lines: string[] = [];
   const r50 = recent.slice(0, Math.min(50, recent.length));
-  const r30 = recent.slice(0, Math.min(30, recent.length));
   const r10 = recent.slice(0, Math.min(10, recent.length));
 
   // === 基础信息 ===
