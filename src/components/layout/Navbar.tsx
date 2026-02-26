@@ -7,39 +7,29 @@ import { cn } from '@/lib/utils';
 import { User } from 'lucide-react';
 
 /**
- * Navbar — Material Design 3 Top App Bar (Small)
+ * Navbar — 轻量化顶部导航栏
  *
- * MD3 规范:
- * - 使用 surface-container 作为背景色（非纯白/毛玻璃）
- * - 导航项使用 on-surface / on-surface-variant 色
- * - 激活态使用 primary 色 + 填充指示器 (primary-container)
- * - 高度 64px (h-16)，紧凑模式可用 48px
- * - 阴影使用 MD3 elevation-2
+ * 设计原则:
+ * - 高度 44px (h-11)，保持轻薄不遮挡内容
+ * - 毛玻璃背景 (frosted glass) + MD3 语义色
+ * - 导航项紧凑排列，激活态使用 primary 色
+ * - 8pt 网格间距
  */
 export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav
-      className="hidden lg:block sticky top-0 z-50"
-      style={{
-        background: 'var(--md-surface-container)',
-        boxShadow: 'var(--md-elevation-2)',
-      }}
-    >
-      <div className="max-w-[980px] mx-auto flex items-center justify-between h-16 px-6">
+    <nav className="hidden lg:block sticky top-0 z-50 apple-nav">
+      <div className="max-w-[980px] mx-auto flex items-center justify-between h-11 px-6">
         {/* Logo + Nav */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span
-              className="md3-title-medium tracking-tight"
-              style={{ color: 'var(--md-primary)' }}
-            >
+            <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--md-primary)' }}>
               {APP_NAME}
             </span>
           </Link>
 
-          {/* Navigation links — MD3 Navigation Tab 风格 */}
+          {/* Navigation links */}
           <div className="flex items-center gap-1">
             {NAV_ITEMS.map((item) => {
               const isActive =
@@ -50,21 +40,16 @@ export default function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'px-4 py-2 md3-label-large rounded-full transition-all',
+                    'px-3 py-1 text-[13px] rounded-full transition-all',
                     isActive
-                      ? ''
-                      : 'hover:bg-[var(--md-surface-container-highest)]'
+                      ? 'font-semibold'
+                      : 'hover:bg-black/[0.04]'
                   )}
-                  style={
-                    isActive
-                      ? {
-                          background: 'var(--md-secondary-container)',
-                          color: 'var(--md-on-secondary-container)',
-                        }
-                      : {
-                          color: 'var(--md-on-surface-variant)',
-                        }
-                  }
+                  style={{
+                    color: isActive
+                      ? 'var(--md-primary)'
+                      : 'var(--md-on-surface-variant)',
+                  }}
                 >
                   {item.label}
                 </Link>
@@ -73,14 +58,14 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* User — MD3 Icon Button + Label */}
+        {/* User */}
         <Link
           href="/user"
-          className="md3-icon-btn flex items-center gap-2 w-auto px-3"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] hover:bg-black/[0.04] transition-all"
           style={{ color: 'var(--md-on-surface-variant)' }}
         >
-          <User size={20} strokeWidth={1.5} />
-          <span className="md3-label-medium">用户中心</span>
+          <User size={14} strokeWidth={1.5} />
+          <span>用户中心</span>
         </Link>
       </div>
     </nav>
