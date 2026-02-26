@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
+import MobileTabBar from '@/components/layout/MobileTabBar';
 import ChatChart from '@/components/chart/ChatChart';
 import ChatSidebar from '@/components/ai/ChatSidebar';
 import DataCardGrid from '@/components/ai/DataCardGrid';
@@ -338,8 +339,10 @@ function AIPageContent() {
             )}
           </div>
 
-          {/* Bottom bar: hot questions + input */}
-          <div className="shrink-0 border-t border-[#e5e5ea] bg-white pb-[env(safe-area-inset-bottom)] lg:pb-2">
+          {/* Bottom bar: hot questions + input
+              移动端底部需要为 MobileTabBar(50px) 留出空间
+              pb-[50px] 确保输入框不被导航栏遮挡 */}
+          <div className="shrink-0 border-t border-[#e5e5ea] bg-white pb-[50px] lg:pb-0">
             {!isEmpty && (
               <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 pt-2 pb-0.5 overflow-x-auto scrollbar-hidden">
                 <div className="flex gap-2 w-max">
@@ -359,7 +362,7 @@ function AIPageContent() {
             )}
 
             {/* Input */}
-            <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 py-2.5 lg:py-3 flex gap-2 items-end">
+            <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 py-2 flex gap-2 items-end">
               <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-full px-4 py-2.5 lg:px-5 lg:py-3 gap-2 focus-within:ring-2 focus-within:ring-[#007AFF]/20 transition-all">
                 <MessageSquare size={14} className="text-[#8e8e93]/70 shrink-0" />
                 <input
@@ -384,7 +387,7 @@ function AIPageContent() {
         </div>
       </div>
 
-      {/* AI 页面使用全屏聊天布局，不渲染底部 TabBar 避免遮挡输入框 */}
+      <MobileTabBar />
     </div>
   );
 }
