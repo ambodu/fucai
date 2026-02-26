@@ -1,5 +1,18 @@
 import type { Metadata } from "next";
+import { Roboto } from "next/font/google";
 import "./globals.css";
+
+/**
+ * MD3 推荐字体: Roboto（含 400/500/700 字重）
+ * 使用 next/font/google 自动优化加载，避免 layout shift。
+ * CSS variable --font-roboto 可在全局样式中引用。
+ */
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+  variable: "--font-roboto",
+});
 
 export const metadata: Metadata = {
   title: "彩数通 - 福彩3D数据查询与AI智能分析平台",
@@ -19,17 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
-      <head>
-        {/* MD3 推荐字体: Roboto（含 400/500/700 字重） */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="antialiased min-h-screen">
+    <html lang="zh-CN" className={roboto.variable}>
+      <body className={`${roboto.className} antialiased min-h-screen`}>
         {children}
       </body>
     </html>

@@ -16,7 +16,6 @@ import {
   HelpCircle,
   Info,
   LogOut,
-  Edit2,
   ClipboardList,
 } from 'lucide-react';
 
