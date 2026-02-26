@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
-import MobileTabBar from '@/components/layout/MobileTabBar';
 import ChatChart from '@/components/chart/ChatChart';
 import ChatSidebar from '@/components/ai/ChatSidebar';
 import DataCardGrid from '@/components/ai/DataCardGrid';
@@ -203,7 +202,7 @@ function AIPageContent() {
     <div className="h-[100dvh] flex flex-col bg-white">
       <Navbar />
 
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex min-h-0 relative">
         <ChatSidebar
           conversations={conversations}
           activeId={activeConversationId}
@@ -340,7 +339,7 @@ function AIPageContent() {
           </div>
 
           {/* Bottom bar: hot questions + input */}
-          <div className="shrink-0 border-t border-[#e5e5ea] bg-white pb-[calc(env(safe-area-inset-bottom)+52px)] lg:pb-2">
+          <div className="shrink-0 border-t border-[#e5e5ea] bg-white pb-[env(safe-area-inset-bottom)] lg:pb-2">
             {!isEmpty && (
               <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 pt-2 pb-0.5 overflow-x-auto scrollbar-hidden">
                 <div className="flex gap-2 w-max">
@@ -385,7 +384,7 @@ function AIPageContent() {
         </div>
       </div>
 
-      <MobileTabBar />
+      {/* AI 页面使用全屏聊天布局，不渲染底部 TabBar 避免遮挡输入框 */}
     </div>
   );
 }
