@@ -93,6 +93,7 @@ export const NAV_ITEMS = [
   { label: '走势图表', href: '/trend', icon: 'chart' },
   { label: '统计分析', href: '/stats', icon: 'database' },
   { label: '数据中心', href: '/data', icon: 'list' },
+  { label: '我的', href: '/user', icon: 'user' },
 ] as const;
 
 export const TREND_NAV_ITEMS = [

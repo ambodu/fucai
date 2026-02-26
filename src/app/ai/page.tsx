@@ -200,10 +200,10 @@ function AIPageContent() {
   }, []);
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-white">
+    <div className="h-[100dvh] flex flex-col bg-white pb-[50px] lg:pb-0">
       <Navbar />
 
-      <div className="flex-1 flex min-h-0 relative">
+      <div className="flex-1 flex min-h-0">
         <ChatSidebar
           conversations={conversations}
           activeId={activeConversationId}
@@ -225,7 +225,7 @@ function AIPageContent() {
                 >
                   <Menu size={18} />
                 </button>
-                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl bg-[#1d1d1f] flex items-center justify-center">
+                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl bg-[#E13C39] flex items-center justify-center">
                   <Sparkles size={14} className="text-white lg:hidden" />
                   <Sparkles size={16} className="text-white hidden lg:block" />
                 </div>
@@ -251,7 +251,7 @@ function AIPageContent() {
                 {/* Hero section */}
                 <div className="flex flex-col items-center justify-center px-4 pt-8 pb-6 lg:pt-12 lg:pb-8">
                   <div className="text-center max-w-lg mx-auto">
-                    <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-[#1d1d1f] flex items-center justify-center mx-auto mb-4">
+                    <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-[#E13C39] flex items-center justify-center mx-auto mb-4">
                       <Sparkles size={24} className="text-white lg:hidden" />
                       <Sparkles size={28} className="text-white hidden lg:block" />
                     </div>
@@ -285,7 +285,7 @@ function AIPageContent() {
                   >
                     <div className={`w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] font-semibold ${
                       msg.role === 'assistant'
-                        ? 'bg-[#1d1d1f] text-white'
+                        ? 'bg-[#E13C39] text-white'
                         : 'bg-[#f5f5f7] text-[#8e8e93]'
                     }`}>
                       {msg.role === 'assistant' ? 'AI' : 'Me'}
@@ -293,7 +293,7 @@ function AIPageContent() {
                     <div className={`px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl text-[13px] lg:text-[14px] leading-relaxed max-w-[85%] lg:max-w-[82%] ${
                       msg.role === 'assistant'
                         ? 'bg-[#f5f5f7] text-[#1d1d1f]'
-                        : 'bg-[#1d1d1f] text-white'
+                        : 'bg-[#E13C39] text-white'
                     }`}>
                       {msg.role === 'assistant' ? (
                         <>
@@ -325,7 +325,7 @@ function AIPageContent() {
                 ))}
                 {isLoading && (
                   <div className="flex gap-2.5 lg:gap-3 mb-4 lg:mb-5">
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-[#1d1d1f] text-white font-semibold">
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-[#E13C39] text-white font-semibold">
                       AI
                     </div>
                     <div className="px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl bg-[#f5f5f7] text-[13px] lg:text-[14px] text-[#8e8e93]">
@@ -339,10 +339,8 @@ function AIPageContent() {
             )}
           </div>
 
-          {/* Bottom bar: hot questions + input
-              移动端底部需要为 MobileTabBar(50px) 留出空间
-              pb-[50px] 确保输入框不被导航栏遮挡 */}
-          <div className="shrink-0 border-t border-[#e5e5ea] bg-white pb-[50px] lg:pb-0">
+          {/* Bottom bar: hot questions + input */}
+          <div className="shrink-0 border-t border-[#e5e5ea] bg-white">
             {!isEmpty && (
               <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 pt-2 pb-0.5 overflow-x-auto scrollbar-hidden">
                 <div className="flex gap-2 w-max">
@@ -378,7 +376,7 @@ function AIPageContent() {
               <button
                 onClick={() => handleSend()}
                 disabled={isLoading || !input.trim()}
-                className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-[#1d1d1f] flex items-center justify-center text-white shrink-0 hover:bg-[#424245] transition-all disabled:opacity-30"
+                className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-[#E13C39] flex items-center justify-center text-white shrink-0 hover:bg-[#c22d2b] transition-all disabled:opacity-30"
               >
                 <Send size={15} />
               </button>
