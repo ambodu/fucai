@@ -6,15 +6,13 @@ import { cn } from '@/lib/utils';
 import { Home, TrendingUp, Sparkles, BarChart3, Database } from 'lucide-react';
 
 /**
- * MobileTabBar — Material Design 3 Navigation Bar
+ * MobileTabBar — 底部导航栏
  *
- * MD3 规范:
- * - 使用 surface-container 背景
- * - 每个 tab 有 icon + label
- * - 激活态 icon 使用 secondary-container 作为 pill 指示器背景
- * - 激活态文字使用 on-surface，非激活态使用 on-surface-variant
- * - 高度 80px（含 safe area）
- * - 图标区域: 64×32 pill shape 指示器
+ * 设计原则:
+ * - 紧凑高度 50px + safe area，不浪费屏幕空间
+ * - 毛玻璃背景，轻薄通透
+ * - 激活态使用 primary 色，非激活态灰色
+ * - 图标 20px + 10px 文字标签
  */
 const MOBILE_TABS = [
   { label: '首页', href: '/', icon: Home },
@@ -29,9 +27,10 @@ export default function MobileTabBar() {
 
   return (
     <div
-      className="md3-nav-bar lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden apple-nav pb-[env(safe-area-inset-bottom)]"
+      style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}
     >
-      <div className="flex w-full">
+      <div className="flex">
         {MOBILE_TABS.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -41,38 +40,26 @@ export default function MobileTabBar() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex-1 flex flex-col items-center pt-3 pb-4 transition-all"
+              className="flex-1 flex flex-col items-center py-1.5 pt-2 transition-all min-h-[50px]"
             >
-              {/* MD3 Active Indicator — pill shape behind icon */}
-              <div
-                className={cn(
-                  'w-16 h-8 rounded-2xl flex items-center justify-center mb-1 transition-all',
-                  isActive ? '' : 'bg-transparent'
-                )}
-                style={
-                  isActive
-                    ? { background: 'var(--md-secondary-container)' }
-                    : undefined
-                }
-              >
-                <Icon
-                  size={20}
-                  strokeWidth={isActive ? 2 : 1.5}
-                  style={{
-                    color: isActive
-                      ? 'var(--md-on-secondary-container)'
-                      : 'var(--md-on-surface-variant)',
-                  }}
-                />
-              </div>
+              <Icon
+                size={20}
+                strokeWidth={isActive ? 2 : 1.5}
+                className="transition-colors mb-0.5"
+                style={{
+                  color: isActive
+                    ? 'var(--md-primary)'
+                    : 'var(--md-on-surface-variant)',
+                }}
+              />
               <span
                 className={cn(
-                  'md3-label-small transition-colors',
-                  isActive ? 'font-medium' : ''
+                  'text-[10px] leading-tight transition-colors',
+                  isActive ? 'font-semibold' : ''
                 )}
                 style={{
                   color: isActive
-                    ? 'var(--md-on-surface)'
+                    ? 'var(--md-primary)'
                     : 'var(--md-on-surface-variant)',
                 }}
               >
