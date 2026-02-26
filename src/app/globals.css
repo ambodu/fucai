@@ -38,6 +38,56 @@
     --chart-4: 33 100% 50%;
     --chart-5: 262 67% 56%;
     --radius: 0.75rem;
+
+    /* ====================================
+       Material Design 3 — Color Tokens
+       基于 MD3 动态配色规范, 以彩票红为 seed color
+       ==================================== */
+    --md-primary: #C00018;              /* Primary */
+    --md-on-primary: #FFFFFF;           /* On Primary */
+    --md-primary-container: #FFDAD4;    /* Primary Container */
+    --md-on-primary-container: #410001; /* On Primary Container */
+
+    --md-secondary: #775651;            /* Secondary */
+    --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #FFDAD4;
+    --md-on-secondary-container: #2C1512;
+
+    --md-tertiary: #705C2E;             /* Tertiary (gold accent) */
+    --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #FCDFA6;
+    --md-on-tertiary-container: #261A00;
+
+    --md-error: #BA1A1A;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #FFDAD6;
+    --md-on-error-container: #410002;
+
+    --md-surface: #FFFBFF;             /* Surface */
+    --md-on-surface: #201A19;
+    --md-surface-variant: #F5DDDA;
+    --md-on-surface-variant: #534341;
+    --md-surface-container-lowest: #FFFFFF;
+    --md-surface-container-low: #FEF1EE;
+    --md-surface-container: #F8EBE9;
+    --md-surface-container-high: #F2E5E3;
+    --md-surface-container-highest: #EDE0DD;
+
+    --md-outline: #857371;
+    --md-outline-variant: #D8C2BE;
+    --md-inverse-surface: #362F2E;
+    --md-inverse-on-surface: #FBEEEC;
+
+    /* MD3 Elevation overlays (tonal) */
+    --md-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.3);
+    --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.3);
+    --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);
+
+    /* MD3 State layer opacities */
+    --md-state-hover: 0.08;
+    --md-state-focus: 0.12;
+    --md-state-pressed: 0.12;
+    --md-state-dragged: 0.16;
   }
 }
 
@@ -47,15 +97,15 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
       'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
     font-size: 15px;
-    color: #1d1d1f;
-    background: #ffffff;
+    color: var(--md-on-surface, #201A19);
+    background: var(--md-surface, #FFFBFF);
   }
 
   html {
@@ -352,4 +402,209 @@
 }
 .gov-table tbody tr:hover {
   background: #f5f5f7;
+}
+
+/* ============================================
+   Material Design 3 — Utility Classes
+   用 Tailwind 友好的方式提供 MD3 组件原语
+   ============================================ */
+
+/* --- MD3 Top App Bar (Small) --- */
+.md3-top-app-bar {
+  @apply sticky top-0 z-50 flex items-center h-16 px-4;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+}
+.md3-top-app-bar-elevated {
+  @apply sticky top-0 z-50 flex items-center h-16 px-4;
+  background: var(--md-surface-container-low);
+  color: var(--md-on-surface);
+  box-shadow: var(--md-elevation-2);
+}
+
+/* --- MD3 Filled Card --- */
+.md3-card-filled {
+  @apply rounded-xl p-0 overflow-hidden;
+  background: var(--md-surface-container-highest);
+  color: var(--md-on-surface);
+}
+
+/* --- MD3 Elevated Card --- */
+.md3-card-elevated {
+  @apply rounded-xl p-0 overflow-hidden;
+  background: var(--md-surface-container-low);
+  color: var(--md-on-surface);
+  box-shadow: var(--md-elevation-1);
+}
+
+/* --- MD3 Outlined Card --- */
+.md3-card-outlined {
+  @apply rounded-xl p-0 overflow-hidden;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-outline-variant);
+}
+
+/* --- MD3 Filled Button --- */
+.md3-btn-filled {
+  @apply inline-flex items-center justify-center gap-2 h-10 px-6 rounded-full text-sm font-medium;
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+.md3-btn-filled:hover {
+  box-shadow: var(--md-elevation-1);
+}
+.md3-btn-filled:active {
+  box-shadow: none;
+}
+
+/* --- MD3 Elevated Button --- */
+.md3-btn-elevated {
+  @apply inline-flex items-center justify-center gap-2 h-10 px-6 rounded-full text-sm font-medium;
+  background: var(--md-surface-container-low);
+  color: var(--md-primary);
+  box-shadow: var(--md-elevation-1);
+  transition: box-shadow 0.2s ease;
+}
+.md3-btn-elevated:hover {
+  box-shadow: var(--md-elevation-2);
+}
+
+/* --- MD3 Tonal Button --- */
+.md3-btn-tonal {
+  @apply inline-flex items-center justify-center gap-2 h-10 px-6 rounded-full text-sm font-medium;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  transition: box-shadow 0.2s ease;
+}
+.md3-btn-tonal:hover {
+  box-shadow: var(--md-elevation-1);
+}
+
+/* --- MD3 Outlined Button --- */
+.md3-btn-outlined {
+  @apply inline-flex items-center justify-center gap-2 h-10 px-6 rounded-full text-sm font-medium;
+  background: transparent;
+  color: var(--md-primary);
+  border: 1px solid var(--md-outline);
+  transition: background 0.2s ease;
+}
+/* MD3 Outlined Button hover: 使用 primary 色的 8% 透明度作为 state layer */
+.md3-btn-outlined:hover {
+  background: rgba(192, 0, 24, 0.08);
+}
+
+/* --- MD3 Text Button --- */
+.md3-btn-text {
+  @apply inline-flex items-center justify-center gap-2 h-10 px-3 rounded-full text-sm font-medium;
+  background: transparent;
+  color: var(--md-primary);
+  transition: background 0.2s ease;
+}
+.md3-btn-text:hover {
+  background: rgba(192, 0, 24, 0.08);
+}
+
+/* --- MD3 FAB (Floating Action Button) --- */
+.md3-fab {
+  @apply flex items-center justify-center w-14 h-14 rounded-2xl;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  box-shadow: var(--md-elevation-3);
+  transition: box-shadow 0.2s ease;
+}
+.md3-fab:hover {
+  box-shadow: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.3);
+}
+
+/* --- MD3 Icon Button --- */
+.md3-icon-btn {
+  @apply flex items-center justify-center w-10 h-10 rounded-full;
+  color: var(--md-on-surface-variant);
+  transition: background 0.2s ease;
+}
+.md3-icon-btn:hover {
+  background: rgba(83, 67, 65, 0.08);
+}
+
+/* --- MD3 Badge --- */
+.md3-badge {
+  @apply inline-flex items-center justify-center min-w-[6px] h-[6px] rounded-full;
+  background: var(--md-error);
+}
+.md3-badge-large {
+  @apply inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[11px] font-medium;
+  background: var(--md-error);
+  color: var(--md-on-error);
+}
+
+/* --- MD3 Divider --- */
+.md3-divider {
+  @apply w-full;
+  height: 1px;
+  background: var(--md-outline-variant);
+}
+
+/* --- MD3 Navigation Bar (Bottom) --- */
+.md3-nav-bar {
+  @apply fixed bottom-0 left-0 right-0 z-50 flex items-end;
+  background: var(--md-surface-container);
+  box-shadow: var(--md-elevation-2);
+  padding-bottom: env(safe-area-inset-bottom);
+  height: calc(80px + env(safe-area-inset-bottom));
+}
+
+/* --- MD3 Typography Scale (mapped to Tailwind-friendly classes) --- */
+.md3-display-large   { @apply text-[57px] leading-[64px] tracking-[-0.25px] font-normal; }
+.md3-display-medium  { @apply text-[45px] leading-[52px] tracking-normal font-normal; }
+.md3-display-small   { @apply text-4xl leading-[44px] tracking-normal font-normal; }
+.md3-headline-large  { @apply text-[32px] leading-10 tracking-normal font-normal; }
+.md3-headline-medium { @apply text-[28px] leading-9 tracking-normal font-normal; }
+.md3-headline-small  { @apply text-2xl leading-8 tracking-normal font-normal; }
+.md3-title-large     { @apply text-[22px] leading-7 tracking-normal font-normal; }
+.md3-title-medium    { @apply text-base leading-6 tracking-[0.15px] font-medium; }
+.md3-title-small     { @apply text-sm leading-5 tracking-[0.1px] font-medium; }
+.md3-body-large      { @apply text-base leading-6 tracking-[0.5px] font-normal; }
+.md3-body-medium     { @apply text-sm leading-5 tracking-[0.25px] font-normal; }
+.md3-body-small      { @apply text-xs leading-4 tracking-[0.4px] font-normal; }
+.md3-label-large     { @apply text-sm leading-5 tracking-[0.1px] font-medium; }
+.md3-label-medium    { @apply text-xs leading-4 tracking-[0.5px] font-medium; }
+.md3-label-small     { @apply text-[11px] leading-4 tracking-[0.5px] font-medium; }
+
+/* --- MD3 Filled Text Field --- */
+.md3-textfield-filled {
+  @apply rounded-t-[4px] rounded-b-none overflow-hidden;
+  background: var(--md-surface-container-highest);
+  border-bottom: 2px solid var(--md-on-surface-variant);
+  color: var(--md-on-surface);
+  transition: border-color 0.2s ease;
+}
+.md3-textfield-filled:focus-within {
+  border-bottom-color: var(--md-primary);
+}
+
+/* --- MD3 Switch (simplified) --- */
+.md3-switch {
+  @apply relative inline-flex items-center w-[52px] h-[32px] rounded-full cursor-pointer transition-all;
+  background: var(--md-surface-container-highest);
+  border: 2px solid var(--md-outline);
+}
+.md3-switch[data-checked="true"] {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+}
+.md3-switch-thumb {
+  @apply absolute w-4 h-4 rounded-full transition-all;
+  background: var(--md-outline);
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.md3-switch[data-checked="true"] .md3-switch-thumb {
+  background: var(--md-on-primary);
+  left: calc(100% - 22px);
+  width: 24px;
+  height: 24px;
+  left: calc(100% - 28px);
 }
