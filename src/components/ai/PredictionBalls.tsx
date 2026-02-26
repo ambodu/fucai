@@ -15,7 +15,7 @@ export default function PredictionBalls({ prediction }: PredictionBallsProps) {
     <div className="bg-[#f5f5f7] rounded-2xl p-4 lg:p-5 mb-3">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <Target size={18} className="text-[#1d1d1f]" />
+        <Target size={18} className="text-[#E13C39]" />
         <h4 className="text-[14px] font-semibold text-[#1d1d1f]">下期推荐号码</h4>
       </div>
 

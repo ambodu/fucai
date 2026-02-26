@@ -28,7 +28,7 @@ function SimpleMarkdown({ content }: { content: string }) {
     // Then apply markdown formatting on the safe string
     result = result.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[#1d1d1f]">$1</strong>');
     result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    result = result.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-[#f5f5f7] rounded text-[12px] text-[#007AFF]">$1</code>');
+    result = result.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-[#f5f5f7] rounded text-[12px] text-[#E13C39]">$1</code>');
     result = result.replace(/^### (.+)$/gm, '<div class="text-[14px] font-semibold text-[#1d1d1f] mt-3 mb-1.5">$1</div>');
     result = result.replace(/^## (.+)$/gm, '<div class="text-base font-semibold text-[#1d1d1f] mt-4 mb-2">$1</div>');
     result = result.replace(/^- (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#8e8e93] shrink-0">•</span><span>$1</span></div>');
@@ -361,7 +361,7 @@ function AIPageContent() {
 
             {/* Input */}
             <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 py-2 flex gap-2 items-end">
-              <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-full px-4 py-2.5 lg:px-5 lg:py-3 gap-2 focus-within:ring-2 focus-within:ring-[#007AFF]/20 transition-all">
+              <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-full px-4 py-2.5 lg:px-5 lg:py-3 gap-2 focus-within:ring-2 focus-within:ring-[#E13C39]/20 transition-all">
                 <MessageSquare size={14} className="text-[#8e8e93]/70 shrink-0" />
                 <input
                   ref={inputRef}

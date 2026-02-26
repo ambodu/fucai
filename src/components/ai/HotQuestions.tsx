@@ -39,7 +39,7 @@ export default function HotQuestions({ onSelect, disabled }: HotQuestionsProps) 
               disabled={disabled}
               className={`px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-[12px] lg:text-[13px] font-medium transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-1 lg:gap-1.5 ${
                 activeCategory === cat.id
-                  ? 'bg-[#1d1d1f] text-white'
+                  ? 'bg-[#E13C39] text-white'
                   : 'bg-[#f5f5f7] text-[#8e8e93] hover:bg-[#e5e5ea] hover:text-[#1d1d1f]'
               }`}
             >
@@ -63,7 +63,7 @@ export default function HotQuestions({ onSelect, disabled }: HotQuestionsProps) 
               <span className="text-sm lg:text-base">{q.icon}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-[13px] lg:text-[14px] font-medium text-[#1d1d1f] group-hover:text-[#007AFF] transition-colors block">{q.label}</span>
+              <span className="text-[13px] lg:text-[14px] font-medium text-[#1d1d1f] group-hover:text-[#E13C39] transition-colors block">{q.label}</span>
               <span className="text-[11px] lg:text-[12px] text-[#8e8e93] line-clamp-1 mt-0.5 block">{q.question}</span>
             </div>
           </button>
