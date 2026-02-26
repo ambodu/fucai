@@ -5,6 +5,17 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Home, TrendingUp, Sparkles, BarChart3, Database } from 'lucide-react';
 
+/**
+ * MobileTabBar — Material Design 3 Navigation Bar
+ *
+ * MD3 规范:
+ * - 使用 surface-container 背景
+ * - 每个 tab 有 icon + label
+ * - 激活态 icon 使用 secondary-container 作为 pill 指示器背景
+ * - 激活态文字使用 on-surface，非激活态使用 on-surface-variant
+ * - 高度 80px（含 safe area）
+ * - 图标区域: 64×32 pill shape 指示器
+ */
 const MOBILE_TABS = [
   { label: '首页', href: '/', icon: Home },
   { label: '走势', href: '/trend', icon: TrendingUp },
@@ -17,30 +28,54 @@ export default function MobileTabBar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pb-[env(safe-area-inset-bottom)] apple-nav border-t-0" style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}>
-      <div className="flex">
+    <div
+      className="md3-nav-bar lg:hidden"
+    >
+      <div className="flex w-full">
         {MOBILE_TABS.map((item) => {
-          const isActive = pathname === item.href ||
+          const isActive =
+            pathname === item.href ||
             (item.href !== '/' && pathname.startsWith(item.href));
           const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex-1 flex flex-col items-center py-1.5 pt-2 transition-all min-h-[50px]"
+              className="flex-1 flex flex-col items-center pt-3 pb-4 transition-all"
             >
-              <Icon
-                size={20}
-                strokeWidth={isActive ? 2 : 1.5}
+              {/* MD3 Active Indicator — pill shape behind icon */}
+              <div
                 className={cn(
-                  'transition-colors mb-0.5',
-                  isActive ? 'text-[#E13C39]' : 'text-[#8e8e93]'
+                  'w-16 h-8 rounded-2xl flex items-center justify-center mb-1 transition-all',
+                  isActive ? '' : 'bg-transparent'
                 )}
-              />
-              <span className={cn(
-                'text-[10px] leading-tight transition-colors',
-                isActive ? 'text-[#E13C39] font-semibold' : 'text-[#8e8e93]'
-              )}>
+                style={
+                  isActive
+                    ? { background: 'var(--md-secondary-container)' }
+                    : undefined
+                }
+              >
+                <Icon
+                  size={20}
+                  strokeWidth={isActive ? 2 : 1.5}
+                  style={{
+                    color: isActive
+                      ? 'var(--md-on-secondary-container)'
+                      : 'var(--md-on-surface-variant)',
+                  }}
+                />
+              </div>
+              <span
+                className={cn(
+                  'md3-label-small transition-colors',
+                  isActive ? 'font-medium' : ''
+                )}
+                style={{
+                  color: isActive
+                    ? 'var(--md-on-surface)'
+                    : 'var(--md-on-surface-variant)',
+                }}
+              >
                 {item.label}
               </span>
             </Link>
