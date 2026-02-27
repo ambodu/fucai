@@ -8,9 +8,17 @@ import { detectQueryType, buildChartData } from '@/lib/chart-builder';
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 15; // 15 requests per minute per IP
+let lastCleanup = Date.now();
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+  // 惰性清理过期条目（代替 setInterval，兼容 Serverless 环境）
+  if (now - lastCleanup > 5 * 60 * 1000) {
+    lastCleanup = now;
+    rateLimitMap.forEach((entry, key) => {
+      if (now > entry.resetTime) rateLimitMap.delete(key);
+    });
+  }
   const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetTime) {
     rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
@@ -19,14 +27,6 @@ function checkRateLimit(ip: string): boolean {
   entry.count++;
   return entry.count <= RATE_LIMIT_MAX;
 }
-
-// Clean up stale entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  rateLimitMap.forEach((entry, key) => {
-    if (now > entry.resetTime) rateLimitMap.delete(key);
-  });
-}, 5 * 60 * 1000);
 
 // --- Data context builder ---
 

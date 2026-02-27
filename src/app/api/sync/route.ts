@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { execSync } from 'child_process';
-import { timingSafeEqual } from 'crypto';
 import { syncConfig } from '@/lib/config';
 
 function safeCompare(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   try {
+    const { timingSafeEqual } = require('crypto') as typeof import('crypto');
     return timingSafeEqual(Buffer.from(a), Buffer.from(b));
   } catch {
-    return false;
+    // fallback: constant-time-ish comparison
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+      result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return result === 0;
   }
 }
 
@@ -41,9 +45,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // dynamic import — 在 Node.js 运行时可用，Edge/Workers 中不可用
+  let execSyncFn: typeof import('child_process').execSync;
+  try {
+    const cp = await import('child_process');
+    execSyncFn = cp.execSync;
+  } catch {
+    return NextResponse.json(
+      { error: '当前运行环境不支持 sync 功能（需要 Node.js 运行时）' },
+      { status: 501 }
+    );
+  }
+
   try {
     // Run sync script
-    const output = execSync('npx tsx scripts/sync-fc3d.ts', {
+    const output = execSyncFn('npx tsx scripts/sync-fc3d.ts', {
       cwd: process.cwd(),
       timeout: 120000,
       encoding: 'utf-8',
