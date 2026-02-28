@@ -3,13 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, TrendingUp, Sparkles, BarChart3, User } from 'lucide-react';
+import { Home, TrendingUp, Sparkles, BarChart3 } from 'lucide-react';
 
 /**
  * MobileTabBar — 底部导航栏
  *
- * 5 个 tab: 首页 / 走势 / AI / 统计 / 我的
- * "我的" 替换原来的 "数据"，作为付费转化入口
+ * 4 个 tab: 首页 / 走势 / AI / 统计
  *
  * 设计原则:
  * - 紧凑高度 50px + safe area
@@ -21,7 +20,6 @@ const MOBILE_TABS = [
   { label: '走势', href: '/trend', icon: TrendingUp },
   { label: 'AI', href: '/ai', icon: Sparkles },
   { label: '统计', href: '/stats', icon: BarChart3 },
-  { label: '我的', href: '/user', icon: User },
 ] as const;
 
 export default function MobileTabBar() {

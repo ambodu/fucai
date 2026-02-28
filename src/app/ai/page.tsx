@@ -9,38 +9,14 @@ import ChatSidebar from '@/components/ai/ChatSidebar';
 import DataCardGrid from '@/components/ai/DataCardGrid';
 import PredictionBalls from '@/components/ai/PredictionBalls';
 import HotQuestions from '@/components/ai/HotQuestions';
+import MarkdownRenderer from '@/components/ai/MarkdownRenderer';
 import { useConversations } from '@/hooks/useConversations';
 import { HOT_QUESTIONS, AI_DISCLAIMER_TEXT } from '@/lib/constants';
-import { ChatMessage, ChartData } from '@/types/ai';
+import { ChatMessage, ChartData, ServerChartData } from '@/types/ai';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
 import { Send, Loader2, Trash2, Sparkles, MessageSquare, Menu } from 'lucide-react';
 
 const latestPeriod = mockDraws[0]?.period || '---';
-
-function SimpleMarkdown({ content }: { content: string }) {
-  const html = useMemo(() => {
-    // Escape HTML entities first to prevent XSS
-    let result = content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-    // Then apply markdown formatting on the safe string
-    result = result.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[#1d1d1f]">$1</strong>');
-    result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    result = result.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-[#f5f5f7] rounded text-[12px] text-[#E13C39]">$1</code>');
-    result = result.replace(/^### (.+)$/gm, '<div class="text-[14px] font-semibold text-[#1d1d1f] mt-3 mb-1.5">$1</div>');
-    result = result.replace(/^## (.+)$/gm, '<div class="text-base font-semibold text-[#1d1d1f] mt-4 mb-2">$1</div>');
-    result = result.replace(/^- (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#8e8e93] shrink-0">•</span><span>$1</span></div>');
-    result = result.replace(/^(\d+)\. (.+)$/gm, '<div class="flex gap-2 ml-1 my-0.5"><span class="text-[#8e8e93] shrink-0">$1.</span><span>$2</span></div>');
-    result = result.replace(/^---$/gm, '<hr class="border-[#e5e5ea] my-3">');
-    result = result.replace(/\n\n/g, '</p><p class="mt-2">');
-    result = result.replace(/\n/g, '<br>');
-    return `<p>${result}</p>`;
-  }, [content]);
-
-  return <div className="prose-sm" dangerouslySetInnerHTML={{ __html: html }} />;
-}
 
 function AIPageContent() {
   const {
@@ -52,6 +28,7 @@ function AIPageContent() {
     switchConversation,
     deleteConversation,
     addMessage,
+    updateMessage,
     clearActiveConversation,
   } = useConversations();
 
@@ -75,6 +52,93 @@ function AIPageContent() {
     }
   }, [initialized, conversations.length, activeConversationId, createConversation]);
 
+  // Shared streaming function
+  const streamAIResponse = useCallback(async (
+    apiMessages: Array<{ role: string; content: string }>,
+    aiMsgId: string,
+  ) => {
+    const res = await fetch('/api/ai/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: apiMessages }),
+    });
+
+    if (!res.ok) {
+      // Try to parse error from SSE or JSON
+      const text = await res.text();
+      let errorMsg = `请求失败 (${res.status})`;
+      try {
+        // SSE format: event: error\ndata: {...}\n\n
+        const dataMatch = text.match(/data:\s*({.*})/);
+        if (dataMatch) {
+          const parsed = JSON.parse(dataMatch[1]);
+          if (parsed.error) errorMsg = parsed.error;
+        }
+      } catch { /* ignore */ }
+      throw new Error(errorMsg);
+    }
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let accumulatedText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() || '';
+
+      for (const part of parts) {
+        const lines = part.split('\n');
+        let eventType = '';
+        let eventData = '';
+
+        for (const line of lines) {
+          if (line.startsWith('event: ')) eventType = line.slice(7);
+          else if (line.startsWith('data: ')) eventData = line.slice(6);
+        }
+
+        if (!eventType || !eventData) continue;
+
+        try {
+          const data = JSON.parse(eventData);
+
+          if (eventType === 'meta') {
+            // Charts/prediction arrived — show immediately
+            const serverCharts: ServerChartData = {
+              queryType: data.queryType || 'prediction',
+              charts: data.charts || [],
+              dataCards: data.dataCards || [],
+              prediction: data.prediction,
+            };
+            updateMessage(aiMsgId, { serverCharts });
+          } else if (eventType === 'text') {
+            accumulatedText += data.text || '';
+            updateMessage(aiMsgId, { content: accumulatedText });
+          } else if (eventType === 'done') {
+            // Final flush
+            updateMessage(aiMsgId, {
+              content: accumulatedText,
+              disclaimer: true,
+            }, true);
+          } else if (eventType === 'error') {
+            throw new Error(data.error || '未知错误');
+          }
+        } catch (e) {
+          if (e instanceof Error && e.message !== '未知错误') throw e;
+        }
+      }
+    }
+
+    // Ensure final save even if no 'done' event
+    if (accumulatedText) {
+      updateMessage(aiMsgId, { content: accumulatedText, disclaimer: true }, true);
+    }
+  }, [updateMessage]);
+
   const handleSend = useCallback(async (question?: string) => {
     const text = question || input.trim();
     if (!text || isLoading) return;
@@ -94,47 +158,30 @@ function AIPageContent() {
     setInput('');
     setIsLoading(true);
 
+    const aiMsgId = String(Date.now() + 1);
+    const aiMsg: ChatMessage = {
+      id: aiMsgId,
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+    };
+    addMessage(aiMsg);
+
     try {
       const apiMessages = activeMessages
         .filter(m => m.id !== '0')
         .concat(userMsg)
         .map(m => ({ role: m.role, content: m.content }));
 
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: apiMessages }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `请求失败 (${res.status})`);
-
-      const aiMsg: ChatMessage = {
-        id: String(Date.now() + 1),
-        role: 'assistant',
-        content: data.content || '',
-        timestamp: Date.now(),
-        disclaimer: true,
-        serverCharts: {
-          queryType: data.queryType || 'prediction',
-          charts: data.charts || [],
-          dataCards: data.dataCards || [],
-          prediction: data.prediction,
-        },
-      };
-      addMessage(aiMsg);
+      await streamAIResponse(apiMessages, aiMsgId);
     } catch (err) {
-      const errorMsg: ChatMessage = {
-        id: String(Date.now() + 1),
-        role: 'assistant',
+      updateMessage(aiMsgId, {
         content: `查询出错：${err instanceof Error ? err.message : '未知错误'}。请稍后重试。`,
-        timestamp: Date.now(),
-      };
-      addMessage(errorMsg);
+      }, true);
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, activeMessages, activeConversationId, addMessage, createConversation]);
+  }, [input, isLoading, activeMessages, activeConversationId, addMessage, createConversation, streamAIResponse, updateMessage]);
 
   useEffect(() => {
     if (autoAskFired.current) return;
@@ -156,44 +203,28 @@ function AIPageContent() {
     addMessage(userMsg);
     setIsLoading(true);
 
+    const aiMsgId = String(Date.now() + 1);
+    const aiMsg: ChatMessage = {
+      id: aiMsgId,
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+    };
+    addMessage(aiMsg);
+
     (async () => {
       try {
         const apiMessages = [{ role: 'user' as const, content: text }];
-        const res = await fetch('/api/ai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: apiMessages }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || `请求失败 (${res.status})`);
-
-        const aiMsg: ChatMessage = {
-          id: String(Date.now() + 1),
-          role: 'assistant',
-          content: data.content || '',
-          timestamp: Date.now(),
-          disclaimer: true,
-          serverCharts: {
-            queryType: data.queryType || 'prediction',
-            charts: data.charts || [],
-            dataCards: data.dataCards || [],
-            prediction: data.prediction,
-          },
-        };
-        addMessage(aiMsg);
+        await streamAIResponse(apiMessages, aiMsgId);
       } catch (err) {
-        const errorMsg: ChatMessage = {
-          id: String(Date.now() + 1),
-          role: 'assistant',
+        updateMessage(aiMsgId, {
           content: `查询出错：${err instanceof Error ? err.message : '未知错误'}。请稍后重试。`,
-          timestamp: Date.now(),
-        };
-        addMessage(errorMsg);
+        }, true);
       } finally {
         setIsLoading(false);
       }
     })();
-  }, [initialized, activeConversationId, searchParams, addMessage]);
+  }, [initialized, activeConversationId, searchParams, addMessage, streamAIResponse, updateMessage]);
 
   const allHotQuestions = useMemo(() => {
     return HOT_QUESTIONS.flatMap(cat => cat.questions);
@@ -310,7 +341,7 @@ function AIPageContent() {
                           {msg.serverCharts?.dataCards && msg.serverCharts.dataCards.length > 0 && (
                             <DataCardGrid cards={msg.serverCharts.dataCards} />
                           )}
-                          {msg.content && <SimpleMarkdown content={msg.content} />}
+                          {msg.content && <MarkdownRenderer content={msg.content} />}
                         </>
                       ) : (
                         <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -323,7 +354,7 @@ function AIPageContent() {
                     </div>
                   </div>
                 ))}
-                {isLoading && (
+                {isLoading && !activeMessages.some(m => m.role === 'assistant' && m.content === '' && !m.serverCharts) && (
                   <div className="flex gap-2.5 lg:gap-3 mb-4 lg:mb-5">
                     <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-[#E13C39] text-white font-semibold">
                       AI

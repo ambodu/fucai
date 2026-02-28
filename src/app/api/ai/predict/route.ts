@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { aiConfig } from '@/lib/config';
-import { getRecentDraws } from '@/lib/data-loader';
-import { getFullHistory } from '@/lib/data-loader-server';
+import { getFreshRecentDraws, getFreshFullHistory } from '@/lib/data-loader-server-fresh';
 
 // In-memory cache
 let cachedPrediction: { data: PredictionData; period: string; timestamp: number } | null = null;
@@ -20,8 +19,8 @@ interface PredictionData {
 }
 
 function buildPredictionContext(): string {
-  const recent = getRecentDraws(100);
-  const full = getFullHistory();
+  const recent = getFreshRecentDraws(100);
+  const full = getFreshFullHistory();
   const latest = recent[0];
   if (!latest) return '';
 
@@ -144,7 +143,7 @@ function validateDigits(arr: unknown): number[] {
 }
 
 function generateFallbackPrediction(currentPeriod: string): PredictionData {
-  const draws = getRecentDraws(50);
+  const draws = getFreshRecentDraws(50);
   const result: { hundreds: number[]; tens: number[]; ones: number[] } = { hundreds: [], tens: [], ones: [] };
 
   for (let pos = 1; pos <= 3; pos++) {
@@ -192,7 +191,7 @@ export async function GET() {
     return NextResponse.json({ error: 'AI 功能未配置' }, { status: 500 });
   }
 
-  const recent = getRecentDraws(1);
+  const recent = getFreshRecentDraws(1);
   const currentPeriod = recent[0]?.period || 'unknown';
 
   // Check cache

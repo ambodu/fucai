@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncConfig } from '@/lib/config';
+import { clearFullCache } from '@/lib/data-loader-server';
 
 function safeCompare(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -75,6 +76,9 @@ export async function POST(request: NextRequest) {
     if (fs.existsSync(logPath)) {
       syncLog = JSON.parse(fs.readFileSync(logPath, 'utf-8'));
     }
+
+    // Clear stale caches so subsequent requests use fresh data
+    clearFullCache();
 
     return NextResponse.json({
       success: true,

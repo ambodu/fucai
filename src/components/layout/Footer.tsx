@@ -99,15 +99,6 @@ export default function Footer() {
                     号码频率
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/user"
-                    className="md3-body-small transition-colors hover:opacity-100"
-                    style={{ color: 'var(--md-on-surface-variant)' }}
-                  >
-                    会员中心
-                  </Link>
-                </li>
               </ul>
             </div>
           </div>

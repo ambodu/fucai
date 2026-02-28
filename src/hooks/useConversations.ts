@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, Conversation, ConversationMeta } from '@/types/ai';
 
 const INDEX_KEY = 'cst-conversations-index';
@@ -266,6 +266,92 @@ export function useConversations() {
     });
   }, [activeConversationId]);
 
+  // Debounced save for streaming updates
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const updateMessage = useCallback((msgId: string, updates: Partial<ChatMessage>, flush = false) => {
+    if (!activeConversationId) return;
+
+    setActiveMessages(prev => {
+      const idx = prev.findIndex(m => m.id === msgId);
+      if (idx === -1) return prev;
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], ...updates };
+      return updated;
+    });
+
+    // Debounced localStorage write — every 500ms during streaming, immediate on flush
+    const doSave = () => {
+      const conv = loadConversation(activeConversationId);
+      if (!conv) return;
+      const idx = conv.messages.findIndex((m: ChatMessage) => m.id === msgId);
+      if (idx === -1) {
+        // Message not in storage yet — find it from current state and push
+        // This uses the functional form to read latest state
+        setActiveMessages(current => {
+          const msg = current.find(m => m.id === msgId);
+          if (msg) {
+            const c = loadConversation(activeConversationId);
+            if (c && !c.messages.some((m: ChatMessage) => m.id === msgId)) {
+              c.messages.push(msg);
+              c.updatedAt = Date.now();
+              saveConversation(c);
+            }
+          }
+          return current; // no change to state
+        });
+      } else {
+        setActiveMessages(current => {
+          const msg = current.find(m => m.id === msgId);
+          if (msg) {
+            const c = loadConversation(activeConversationId);
+            if (c) {
+              const i = c.messages.findIndex((m: ChatMessage) => m.id === msgId);
+              if (i !== -1) {
+                c.messages[i] = msg;
+                c.updatedAt = Date.now();
+                saveConversation(c);
+              }
+            }
+          }
+          return current;
+        });
+      }
+
+      // Update index
+      setConversations(prev => {
+        const conv2 = loadConversation(activeConversationId);
+        if (!conv2) return prev;
+        const lastAssistant = [...conv2.messages].reverse().find(m => m.role === 'assistant');
+        return prev.map(c =>
+          c.id === activeConversationId
+            ? {
+                ...c,
+                updatedAt: conv2.updatedAt,
+                messageCount: conv2.messages.length,
+                preview: lastAssistant ? lastAssistant.content.slice(0, 50) : c.preview,
+              }
+            : c
+        ).sort((a, b) => b.updatedAt - a.updatedAt);
+      });
+    };
+
+    if (flush) {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+      doSave();
+    } else {
+      if (!saveTimerRef.current) {
+        saveTimerRef.current = setTimeout(() => {
+          saveTimerRef.current = null;
+          doSave();
+        }, 500);
+      }
+    }
+  }, [activeConversationId]);
+
   const clearActiveConversation = useCallback(() => {
     if (activeConversationId) {
       deleteConversationData(activeConversationId);
@@ -314,6 +400,7 @@ export function useConversations() {
     switchConversation,
     deleteConversation,
     addMessage,
+    updateMessage,
     clearActiveConversation,
   };
 }
