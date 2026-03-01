@@ -10,7 +10,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { FC3DDraw } from '@/types/fc3d';
-import { rawToFC3DDraw } from '@/lib/data-loader';
+import { getRecentDraws, rawToFC3DDraw } from '@/lib/data-loader';
 
 interface RawDraw {
   period: string;
@@ -27,12 +27,16 @@ interface DataFile {
 }
 
 function readAndTransform(filePath: string): FC3DDraw[] {
-  const abs = path.resolve(process.cwd(), filePath);
-  if (!fs.existsSync(abs)) return [];
-  const content = fs.readFileSync(abs, 'utf-8');
-  const data: DataFile = JSON.parse(content);
-  if (!data.draws || data.draws.length === 0) return [];
-  return data.draws.map((raw, i) => rawToFC3DDraw(raw, data.draws.length - i));
+  try {
+    const abs = path.resolve(process.cwd(), filePath);
+    if (!fs.existsSync(abs)) return [];
+    const content = fs.readFileSync(abs, 'utf-8');
+    const data: DataFile = JSON.parse(content);
+    if (!data.draws || data.draws.length === 0) return [];
+    return data.draws.map((raw, i) => rawToFC3DDraw(raw, data.draws.length - i));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -40,8 +44,9 @@ function readAndTransform(filePath: string): FC3DDraw[] {
  */
 export function getFreshRecentDraws(count?: number): FC3DDraw[] {
   const draws = readAndTransform('data/fc3d-latest.json');
-  if (count && count < draws.length) return draws.slice(0, count);
-  return draws;
+  const effectiveDraws = draws.length > 0 ? draws : getRecentDraws();
+  if (count && count < effectiveDraws.length) return effectiveDraws.slice(0, count);
+  return effectiveDraws;
 }
 
 /**
