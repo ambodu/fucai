@@ -37,8 +37,12 @@ function posLabel(pos: number): string {
   return pos === 1 ? '百位' : pos === 2 ? '十位' : '个位';
 }
 
-function buildDataContext(): string {
-  const recent = getFreshRecentDraws(100);
+function shouldUseFullHistory(query: string): boolean {
+  return /(全量|全部|历史所有|完整历史|所有期|全历史)/i.test(query);
+}
+
+function buildDataContext(userQuery: string): string {
+  const recent = getFreshRecentDraws(200);
   const full = getFreshFullHistory();
   const latest = recent[0];
 
@@ -56,11 +60,31 @@ function buildDataContext(): string {
   lines.push(`组态=${latest.group === 'triplet' ? '豹子' : latest.group === 'pair' ? '对子' : '组六'}`);
   lines.push('');
 
-  // === 最近15期明细 ===
-  lines.push('=== 最近15期开奖明细 ===');
-  recent.slice(0, 15).forEach(d => {
+  // === 最近200期明细（用于AI推演）===
+  lines.push('=== 最近200期开奖明细（用于AI推演下一期） ===');
+  recent.forEach(d => {
     lines.push(`  ${d.period}: ${d.digit1}${d.digit2}${d.digit3} | 和=${d.sum} 跨=${d.span} 和尾=${d.sumTail} ${d.bigSmallPattern} ${d.oddEvenPattern} ${d.primeCompositePattern} 012路=${d.road012.join('')} ${d.group === 'triplet' ? '[豹子]' : d.group === 'pair' ? '[对子]' : ''}`);
   });
+  lines.push('');
+
+  // === 多窗口频率分析 ===
+  lines.push('=== 多窗口频率分析（近10/50/100/200期） ===');
+  for (let pos = 1; pos <= 3; pos++) {
+    const label = posLabel(pos);
+    const summaries = [10, 50, 100, 200].map(window => {
+      const target = recent.slice(0, Math.min(window, recent.length));
+      const freq: Record<number, number> = {};
+      for (let d = 0; d <= 9; d++) freq[d] = 0;
+      target.forEach(draw => freq[getDigit(draw, pos)]++);
+      const top = Object.entries(freq)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([d, c]) => `${d}(${c})`)
+        .join(', ');
+      return `${window}期热号=${top}`;
+    });
+    lines.push(`  ${label}: ${summaries.join(' | ')}`);
+  }
   lines.push('');
 
   // === 各位频率分析 (近50期) ===
@@ -246,6 +270,22 @@ function buildDataContext(): string {
   const fullPairs = full.filter(d => d.group === 'pair');
   lines.push(`  历史对子: ${fullPairs.length}次 (概率${(fullPairs.length / full.length * 100).toFixed(2)}%)`);
 
+  for (let pos = 1; pos <= 3; pos++) {
+    const freq: Record<number, number> = {};
+    for (let d = 0; d <= 9; d++) freq[d] = 0;
+    full.forEach(draw => freq[getDigit(draw, pos)]++);
+    const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a);
+    lines.push(`  ${posLabel(pos)}全历史频率: ${sorted.map(([d, c]) => `${d}(${c})`).join(' ')}`);
+  }
+
+  if (shouldUseFullHistory(userQuery)) {
+    lines.push('');
+    lines.push('=== 全量历史逐期简表（用户请求全历史分析） ===');
+    full.forEach(d => {
+      lines.push(`  ${d.period}: ${d.digit1}${d.digit2}${d.digit3} 和=${d.sum} 跨=${d.span}`);
+    });
+  }
+
   return lines.join('\n');
 }
 
@@ -255,7 +295,7 @@ function buildSystemPrompt(dataContext: string): string {
 ## 核心原则
 1. **数据驱动**: 所有分析必须引用提供的真实数据，每个结论都要附上具体数字证据（频率、遗漏值、百分比等）
 2. **多维交叉验证**: 推荐号码时从多个维度交叉验证（频率+遗漏+趋势+形态），不能仅凭单一指标
-3. **区分长短期趋势**: 同时参考近10期（短期）和近50期（中期）数据，指出趋势变化
+3. **区分长短期趋势**: 同时参考近10期（短期）、近50/100期（中期）、近200期（扩展中期）数据，指出趋势变化
 4. **概率思维**: 明确说明推荐的概率依据，不做绝对化预测
 5. **回答精确简练**: 用数据说话，避免空泛描述，直接给出数字和结论
 
@@ -263,7 +303,7 @@ function buildSystemPrompt(dataContext: string): string {
 
 ### 号码推荐逻辑（预测/推荐/下期/建议/选号/胆码）
 分析步骤：
-1. **热号分析**: 近50期高频号码 → 近10期是否仍保持热度
+1. **热号分析**: 近200期/近50期高频号码 → 近10期是否仍保持热度
 2. **遗漏回补**: 遗漏≥8期的号码有回补可能，遗漏≥12期重点关注
 3. **趋势判断**: 近5期各位数字的走势方向（升/降/震荡）
 4. **复隔中参考**: 根据近期复隔中比例，判断本期可能的复码/隔码/中码数量
@@ -282,15 +322,15 @@ function buildSystemPrompt(dataContext: string): string {
 - **双胆**: 一个从热号中选（高频稳定），一个从高遗漏中选（回补预期），分别说明依据
 
 ### 杀号逻辑（杀号/杀码/排除）
-- **杀号**: 选择近50期频率最低（≤2次）且近10期完全未出的号码，分各位分析
-- **杀和值**: 排除近50期出现0次或仅1次的和值
-- **杀跨度**: 排除近50期出现次数最少的跨度值（≤2次）
+- **杀号**: 优先看近200期低频号码，再结合近50期频率最低（≤2次）且近10期完全未出的号码，分各位分析
+- **杀和值**: 排除近200期出现0次或极低频的和值
+- **杀跨度**: 排除近200期出现次数最少的跨度值
 - 每个杀号结论必须附带具体的频率数据
 
 ### 012路分析逻辑
 - 0路数字: 0,3,6,9 | 1路数字: 1,4,7 | 2路数字: 2,5,8
-- 分析各位置012路的50期分布比例
-- 对比近10期和近50期的比例变化
+- 分析各位置012路的200期分布比例
+- 对比近10期和近50/200期的比例变化
 - 给出下期各位012路形态预测，引用比例数据
 
 ### 复隔中分析逻辑
@@ -301,7 +341,7 @@ function buildSystemPrompt(dataContext: string): string {
 - 预判下期复隔中比例
 
 ### 和值/跨度分析逻辑
-- 展示近50期的平均值、高频值、分布区间
+- 展示近200期与近50期的平均值、高频值、分布区间
 - 分析近5期走势方向
 - 给出下期参考区间，引用具体数据
 
@@ -528,11 +568,11 @@ export async function POST(request: NextRequest) {
   const queryType = detectQueryType(userMessage);
 
   // Build deterministic chart data from real data (server-side)
-  const recent = getFreshRecentDraws(100);
+  const recent = getFreshRecentDraws(200);
   const serverData = buildChartData(queryType, recent);
 
   try {
-    const dataContext = buildDataContext();
+    const dataContext = buildDataContext(userMessage);
     const systemPrompt = buildSystemPrompt(dataContext);
     const recentMessages = body.messages.slice(-10).map(m => ({
       role: m.role as 'user' | 'assistant',

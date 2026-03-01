@@ -19,7 +19,7 @@ interface PredictionData {
 }
 
 function buildPredictionContext(): string {
-  const recent = getFreshRecentDraws(100);
+  const recent = getFreshRecentDraws(200);
   const full = getFreshFullHistory();
   const latest = recent[0];
   if (!latest) return '';
@@ -29,8 +29,8 @@ function buildPredictionContext(): string {
   lines.push(`和值=${latest.sum}, 跨度=${latest.span}`);
   lines.push('');
 
-  lines.push('最近20期开奖:');
-  recent.slice(0, 20).forEach(d => {
+  lines.push('最近200期开奖（用于推演下一期）:');
+  recent.forEach(d => {
     lines.push(`${d.period}: ${d.digit1} ${d.digit2} ${d.digit3} | 和值=${d.sum} 跨度=${d.span} ${d.bigSmallPattern} ${d.oddEvenPattern}`);
   });
   lines.push('');
@@ -65,6 +65,18 @@ function buildPredictionContext(): string {
 
   lines.push('');
   lines.push(`全部历史共 ${full.length} 期数据`);
+  lines.push('全历史分布（百/十/个）:');
+  for (let pos = 1; pos <= 3; pos++) {
+    const posLabel = pos === 1 ? '百位' : pos === 2 ? '十位' : '个位';
+    const freq: Record<number, number> = {};
+    for (let d = 0; d <= 9; d++) freq[d] = 0;
+    full.forEach(draw => {
+      const digit = pos === 1 ? draw.digit1 : pos === 2 ? draw.digit2 : draw.digit3;
+      freq[digit]++;
+    });
+    const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a);
+    lines.push(`${posLabel}全历史频率: ${sorted.map(([d, c]) => `${d}(${c})`).join(' ')}`);
+  }
 
   return lines.join('\n');
 }
@@ -82,7 +94,7 @@ const PREDICT_PROMPT = `基于以下福彩3D历史数据，分析下一期的号
   "analysis": "简要分析理由(100字以内)"
 }
 
-分析方法：结合频率分析、遗漏值分析、趋势分析、和值/跨度的均值回归。
+分析方法：结合近10/50/100/200期频率分析、遗漏值分析、趋势分析，并用全历史分布做长期约束，给出下一期参考。
 
 数据：
 `;
