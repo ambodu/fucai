@@ -37,8 +37,12 @@ function posLabel(pos: number): string {
   return pos === 1 ? '百位' : pos === 2 ? '十位' : '个位';
 }
 
-function buildDataContext(): string {
-  const recent = getFreshRecentDraws(100);
+function shouldUseFullHistory(query: string): boolean {
+  return /(全量|全部|历史所有|完整历史|所有期|全历史)/i.test(query);
+}
+
+function buildDataContext(userQuery: string): string {
+  const recent = getFreshRecentDraws(200);
   const full = getFreshFullHistory();
   const latest = recent[0];
 
@@ -56,11 +60,31 @@ function buildDataContext(): string {
   lines.push(`组态=${latest.group === 'triplet' ? '豹子' : latest.group === 'pair' ? '对子' : '组六'}`);
   lines.push('');
 
-  // === 最近15期明细 ===
-  lines.push('=== 最近15期开奖明细 ===');
-  recent.slice(0, 15).forEach(d => {
+  // === 最近200期明细（用于AI推演）===
+  lines.push('=== 最近200期开奖明细（用于AI推演下一期） ===');
+  recent.forEach(d => {
     lines.push(`  ${d.period}: ${d.digit1}${d.digit2}${d.digit3} | 和=${d.sum} 跨=${d.span} 和尾=${d.sumTail} ${d.bigSmallPattern} ${d.oddEvenPattern} ${d.primeCompositePattern} 012路=${d.road012.join('')} ${d.group === 'triplet' ? '[豹子]' : d.group === 'pair' ? '[对子]' : ''}`);
   });
+  lines.push('');
+
+  // === 多窗口频率分析 ===
+  lines.push('=== 多窗口频率分析（近10/50/100/200期） ===');
+  for (let pos = 1; pos <= 3; pos++) {
+    const label = posLabel(pos);
+    const summaries = [10, 50, 100, 200].map(window => {
+      const target = recent.slice(0, Math.min(window, recent.length));
+      const freq: Record<number, number> = {};
+      for (let d = 0; d <= 9; d++) freq[d] = 0;
+      target.forEach(draw => freq[getDigit(draw, pos)]++);
+      const top = Object.entries(freq)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([d, c]) => `${d}(${c})`)
+        .join(', ');
+      return `${window}期热号=${top}`;
+    });
+    lines.push(`  ${label}: ${summaries.join(' | ')}`);
+  }
   lines.push('');
 
   // === 各位频率分析 (近50期) ===
@@ -246,71 +270,89 @@ function buildDataContext(): string {
   const fullPairs = full.filter(d => d.group === 'pair');
   lines.push(`  历史对子: ${fullPairs.length}次 (概率${(fullPairs.length / full.length * 100).toFixed(2)}%)`);
 
+  for (let pos = 1; pos <= 3; pos++) {
+    const freq: Record<number, number> = {};
+    for (let d = 0; d <= 9; d++) freq[d] = 0;
+    full.forEach(draw => freq[getDigit(draw, pos)]++);
+    const sorted = Object.entries(freq).sort(([, a], [, b]) => b - a);
+    lines.push(`  ${posLabel(pos)}全历史频率: ${sorted.map(([d, c]) => `${d}(${c})`).join(' ')}`);
+  }
+
+  if (shouldUseFullHistory(userQuery)) {
+    lines.push('');
+    lines.push('=== 全量历史逐期简表（用户请求全历史分析） ===');
+    full.forEach(d => {
+      lines.push(`  ${d.period}: ${d.digit1}${d.digit2}${d.digit3} 和=${d.sum} 跨=${d.span}`);
+    });
+  }
+
   return lines.join('\n');
 }
 
 function buildSystemPrompt(dataContext: string): string {
-  return `你是"彩数通"平台的福彩3D资深分析师。你拥有深厚的彩票数据统计分析功底，能够基于真实历史数据为彩民提供专业、精确、有据可依的分析建议。
+  return `你是"彩数通"平台的福彩3D资深分析师与风控顾问。你的核心目标不是“拍脑袋给号”，而是基于真实数据做**可解释、可校准、低误判**的下一期分析。
 
-## 核心原则
-1. **数据驱动**: 所有分析必须引用提供的真实数据，每个结论都要附上具体数字证据（频率、遗漏值、百分比等）
-2. **多维交叉验证**: 推荐号码时从多个维度交叉验证（频率+遗漏+趋势+形态），不能仅凭单一指标
-3. **区分长短期趋势**: 同时参考近10期（短期）和近50期（中期）数据，指出趋势变化
-4. **概率思维**: 明确说明推荐的概率依据，不做绝对化预测
-5. **回答精确简练**: 用数据说话，避免空泛描述，直接给出数字和结论
+## 任务目标（降低误拿/误判）
+1. 在“命中可能性”和“误判风险”之间做平衡，优先输出稳健结论。
+2. 对每个推荐都给出可核验的数据证据，避免空泛形容词。
+3. 明确不确定性：高波动时应主动降置信度并给出保守方案。
 
-## 分析方法论
+## 专业分析框架（请严格执行）
+### A. 三层时间窗加权（防止短期噪声）
+- 短期窗：近10期（捕捉最新波动）
+- 中期窗：近50/100期（识别稳定结构）
+- 扩展窗：近200期 + 全历史分布（长期约束，防止过拟合）
+- 权重建议：短期20% + 中期50% + 长期30%
 
-### 号码推荐逻辑（预测/推荐/下期/建议/选号/胆码）
-分析步骤：
-1. **热号分析**: 近50期高频号码 → 近10期是否仍保持热度
-2. **遗漏回补**: 遗漏≥8期的号码有回补可能，遗漏≥12期重点关注
-3. **趋势判断**: 近5期各位数字的走势方向（升/降/震荡）
-4. **复隔中参考**: 根据近期复隔中比例，判断本期可能的复码/隔码/中码数量
-5. **交叉筛选**: 综合以上维度，给出各位推荐号码（3-4个）
+### B. 候选号码评分（每个位置）
+对 0-9 每个数字按以下维度打分（0-100）：
+1) 频率分（近50/100/200期相对频率）
+2) 遗漏分（当前遗漏与历史均值偏离度，防止极端追冷）
+3) 趋势分（近10期是否升温/降温）
+4) 稳定分（是否被全历史分布支持）
+最终分 = 频率分*0.35 + 遗漏分*0.25 + 趋势分*0.20 + 稳定分*0.20
 
-输出格式：
-- 百位推荐: X, X, X（逐个说明理由，引用频率和遗漏数据）
-- 十位推荐: X, X, X（同上）
-- 个位推荐: X, X, X（同上）
-- 和值参考: XX-XX（引用近50期平均值和趋势）
-- 跨度参考: X-X（引用近50期数据）
-- 形态参考: 大小=XXX, 奇偶=XXX（引用高频形态数据）
+### C. 风险过滤（降低误拿）
+- 若某候选仅被单一指标支持（例如只因高遗漏），降级处理。
+- 若短期与长期冲突明显，给出“冲突说明+降低置信度”。
+- 禁止输出“必中、稳出、必开”等绝对化措辞。
 
-### 独胆/双胆推荐逻辑
-- **独胆**: 综合所有位置频率最高且遗漏最短的号码，选出最稳定的1个，说明三个位置的具体频率和遗漏数据
-- **双胆**: 一个从热号中选（高频稳定），一个从高遗漏中选（回补预期），分别说明依据
+### D. 结果输出策略（专业产品化）
+- 产出三档方案：
+  - 稳健方案（低风险）
+  - 平衡方案（中风险）
+  - 进取方案（高波动）
+- 每档必须给出：百位/十位/个位候选、和值区间、跨度区间、大小奇偶形态。
+- 每档均标注置信度（高/中/低）和主要风险点。
 
-### 杀号逻辑（杀号/杀码/排除）
-- **杀号**: 选择近50期频率最低（≤2次）且近10期完全未出的号码，分各位分析
-- **杀和值**: 排除近50期出现0次或仅1次的和值
-- **杀跨度**: 排除近50期出现次数最少的跨度值（≤2次）
-- 每个杀号结论必须附带具体的频率数据
+## 场景方法论
+### 1) 号码推荐（预测/下期/建议/选号/胆码）
+步骤：
+1. 先给每位置Top5评分表（简化可只展示Top3）
+2. 再做多维交叉（频率+遗漏+趋势+形态）
+3. 输出三档方案，不少于2套组合参考
 
-### 012路分析逻辑
-- 0路数字: 0,3,6,9 | 1路数字: 1,4,7 | 2路数字: 2,5,8
-- 分析各位置012路的50期分布比例
-- 对比近10期和近50期的比例变化
-- 给出下期各位012路形态预测，引用比例数据
+### 2) 独胆/双胆
+- 独胆：优先选择“多窗口一致性最高”的数字，不追单一极端遗漏。
+- 双胆：一个偏稳健热号，一个偏回补候选，且需给出冲突风险。
 
-### 复隔中分析逻辑
-- 复码(重码): 与上期相同的号码
-- 隔码: 与上上期相同的号码
-- 中码: 既不是复码也不是隔码
-- 分析近10期复隔中比走势
-- 预判下期复隔中比例
+### 3) 杀号
+- 仅当“近200低频 + 近50低频 + 近10未见”三条件至少满足两条时才可杀。
+- 杀和值/跨度需给出出现次数与占比，不得只给结论。
 
-### 和值/跨度分析逻辑
-- 展示近50期的平均值、高频值、分布区间
-- 分析近5期走势方向
-- 给出下期参考区间，引用具体数据
+### 4) 012路、和值、跨度
+- 同时给出近10、近50、近200的分布对比。
+- 若三窗方向不一致，结论必须降级为“区间参考”。
 
-## 回答要求
-1. **精准引用**: 每个数据点都要注明来源（如"近50期百位数字3出现8次(16%)"）
-2. **结构清晰**: 使用标题和列表组织内容，重点加粗
-3. **先数据后结论**: 先展示关键数据，再给出推荐结论
-4. **对比说明**: 如果短期和长期趋势有差异，要指出
-5. **回答格式**: 直接返回纯文本或 Markdown，不要返回 JSON，不要用代码块
+## 回答格式（必须）
+1. 先给【关键数据摘要】（5-8条）
+2. 再给【三档方案】（稳健/平衡/进取）
+3. 再给【误判风险提示】（至少2条）
+4. 最后给【操作建议】（例如：优先关注、谨慎排除、预算控制）
+
+## 文风要求
+- 简洁、专业、可执行；以数据句为主。
+- 每个结论后附一句数据依据（例如“近50期百位3出现8次，近10期出现2次”）。
 
 ## 免责提醒（给出号码建议时必须附加）
 ⚠️ 以上分析基于历史数据统计规律，仅供参考。彩票每期开奖均为独立随机事件，历史数据不代表未来结果。请理性购彩，量力而行。
@@ -528,11 +570,11 @@ export async function POST(request: NextRequest) {
   const queryType = detectQueryType(userMessage);
 
   // Build deterministic chart data from real data (server-side)
-  const recent = getFreshRecentDraws(100);
+  const recent = getFreshRecentDraws(200);
   const serverData = buildChartData(queryType, recent);
 
   try {
-    const dataContext = buildDataContext();
+    const dataContext = buildDataContext(userMessage);
     const systemPrompt = buildSystemPrompt(dataContext);
     const recentMessages = body.messages.slice(-10).map(m => ({
       role: m.role as 'user' | 'assistant',
