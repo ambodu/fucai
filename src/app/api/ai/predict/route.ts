@@ -81,26 +81,31 @@ function buildPredictionContext(): string {
   return lines.join('\n');
 }
 
-const PREDICT_PROMPT = `基于以下福彩3D历史数据，分析下一期的号码参考。
+const PREDICT_PROMPT = `基于以下福彩3D历史数据，给出“低误判优先”的下一期参考。
 
 你必须返回严格的JSON格式（不要加markdown代码块标记），格式如下：
 {
-  "hundreds": [最可能的3个百位数字],
-  "tens": [最可能的3个十位数字],
-  "ones": [最可能的3个个位数字],
+  "hundreds": [最可能的3-4个百位数字],
+  "tens": [最可能的3-4个十位数字],
+  "ones": [最可能的3-4个个位数字],
   "sumRange": [和值下限, 和值上限],
   "spanRange": [跨度下限, 跨度上限],
-  "confidence": "基于数据质量的置信度描述",
-  "analysis": "简要分析理由(100字以内)"
+  "confidence": "高/中/低 + 原因",
+  "analysis": "简要分析理由(120字以内，需包含至少2个数据依据)"
 }
 
-分析方法：结合近10/50/100/200期频率分析、遗漏值分析、趋势分析，并用全历史分布做长期约束，给出下一期参考。
+请严格执行以下优化规则（降低误拿/误判）：
+1) 多窗口一致性：必须同时参考近10/50/100/200期与全历史分布。
+2) 候选评分：优先输出“频率稳定 + 遗漏不过热 + 短期有延续”的数字，避免只靠单一高遗漏。
+3) 风险抑制：若短期与长期冲突，缩小候选激进度并下调confidence。
+4) 区间稳健：sumRange/spanRange以覆盖稳定区为主，不追极端边缘值。
+5) 禁止绝对化：不得出现“必中/必出/稳开”等表述。
 
 数据：
 `;
 
 async function callAI(prompt: string): Promise<string> {
-  const systemPrompt = '你是一个数据分析专家，只返回纯JSON格式数据，不要加任何markdown标记或额外文字。';
+  const systemPrompt = '你是一个严格风控导向的数据分析专家。目标是降低误判风险，只返回纯JSON格式，不要markdown，不要额外文字。';
 
   if (aiConfig.provider === 'gemini') {
     const { GoogleGenAI } = await import('@google/genai');
