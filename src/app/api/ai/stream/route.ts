@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { aiConfig } from '@/lib/config';
 import { getFreshRecentDraws, getFreshFullHistory, isDataStale } from '@/lib/data-loader-server-fresh';
-import { detectQueryType, buildChartData } from '@/lib/chart-builder';
 
 // --- Reuse rate limiter from parent route ---
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -328,12 +327,6 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // Build chart data (deterministic, server-side)
-  const userMessage = body.messages[body.messages.length - 1]?.content || '';
-  const queryType = detectQueryType(userMessage);
-  const recent = getFreshRecentDraws(100);
-  const serverData = buildChartData(queryType, recent);
-
   const dataContext = buildDataContext();
   const systemPrompt = buildSystemPrompt(dataContext);
   const recentMessages = body.messages.slice(-10).map(m => ({
@@ -345,16 +338,8 @@ export async function POST(request: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      // 1. Send meta event with charts/dataCards/prediction immediately
-      controller.enqueue(encoder.encode(sseEvent('meta', {
-        queryType: serverData.queryType,
-        charts: serverData.charts,
-        dataCards: serverData.dataCards,
-        prediction: serverData.prediction || undefined,
-      })));
-
       try {
-        // 2. Stream AI text
+        // Stream AI text
         if (aiConfig.provider === 'openai') {
           await streamOpenAI(systemPrompt, recentMessages, controller, encoder);
         } else if (aiConfig.provider === 'anthropic') {
@@ -363,7 +348,7 @@ export async function POST(request: NextRequest) {
           await streamGemini(systemPrompt, recentMessages, controller, encoder);
         }
 
-        // 3. Done
+        // Done
         controller.enqueue(encoder.encode(sseEvent('done', {})));
       } catch (err) {
         const message = err instanceof Error ? err.message : '未知错误';
