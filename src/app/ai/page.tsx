@@ -4,15 +4,12 @@ import { useState, useRef, useEffect, useMemo, useCallback, Suspense } from 'rea
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import MobileTabBar from '@/components/layout/MobileTabBar';
-import ChatChart from '@/components/chart/ChatChart';
 import ChatSidebar from '@/components/ai/ChatSidebar';
-import DataCardGrid from '@/components/ai/DataCardGrid';
-import PredictionBalls from '@/components/ai/PredictionBalls';
 import HotQuestions from '@/components/ai/HotQuestions';
 import MarkdownRenderer from '@/components/ai/MarkdownRenderer';
 import { useConversations } from '@/hooks/useConversations';
 import { HOT_QUESTIONS, AI_DISCLAIMER_TEXT } from '@/lib/constants';
-import { ChatMessage, ChartData, ServerChartData } from '@/types/ai';
+import { ChatMessage } from '@/types/ai';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
 import { Send, Loader2, Trash2, Sparkles, MessageSquare, Menu, Square } from 'lucide-react';
 
@@ -38,6 +35,8 @@ function AIPageContent() {
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [streamingText, setStreamingText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const shouldAutoScrollRef = useRef(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const autoAskFired = useRef(false);
   const streamControllerRef = useRef<AbortController | null>(null);
@@ -45,9 +44,22 @@ function AIPageContent() {
 
   const isEmpty = activeMessages.length === 0 && !isLoading;
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  }, []);
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeMessages, streamingText]);
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom(streamingText ? 'auto' : 'smooth');
+    }
+  }, [activeMessages, streamingText, scrollToBottom]);
+
+  const handleMessagesScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    shouldAutoScrollRef.current = distanceToBottom < 100;
+  }, []);
 
   useEffect(() => {
     if (initialized && conversations.length === 0 && !activeConversationId) {
@@ -117,15 +129,7 @@ function AIPageContent() {
       const eventData = dataLines.join('\n');
       const data = JSON.parse(eventData);
 
-      if (eventType === 'meta') {
-        const serverCharts: ServerChartData = {
-          queryType: data.queryType || 'prediction',
-          charts: data.charts || [],
-          dataCards: data.dataCards || [],
-          prediction: data.prediction,
-        };
-        updateMessage(aiMsgId, { serverCharts });
-      } else if (eventType === 'text') {
+      if (eventType === 'text') {
         accumulatedText += data.text || '';
         setStreamingText(accumulatedText);
         updateMessage(aiMsgId, { content: accumulatedText });
@@ -199,6 +203,7 @@ function AIPageContent() {
     addMessage(aiMsg);
     setStreamingMessageId(aiMsgId);
     setStreamingText('');
+    shouldAutoScrollRef.current = true;
 
     try {
       const apiMessages = activeMessages
@@ -306,7 +311,11 @@ function AIPageContent() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div
+            ref={messagesContainerRef}
+            onScroll={handleMessagesScroll}
+            className="flex-1 overflow-y-auto overscroll-contain"
+          >
             {isEmpty ? (
               <div className="flex flex-col min-h-full">
                 <div className="flex flex-col items-center justify-center px-4 pt-8 pb-6 lg:pt-12 lg:pb-8">
@@ -355,19 +364,6 @@ function AIPageContent() {
                     }`}>
                       {msg.role === 'assistant' ? (
                         <>
-                          {msg.serverCharts?.prediction && (
-                            <PredictionBalls prediction={msg.serverCharts.prediction} />
-                          )}
-                          {msg.serverCharts?.charts && msg.serverCharts.charts.length > 0 && (
-                            <div className="space-y-2 lg:space-y-3 mb-2 lg:mb-3">
-                              {msg.serverCharts.charts.map((chart: ChartData, i: number) => (
-                                <ChatChart key={i} chart={chart} />
-                              ))}
-                            </div>
-                          )}
-                          {msg.serverCharts?.dataCards && msg.serverCharts.dataCards.length > 0 && (
-                            <DataCardGrid cards={msg.serverCharts.dataCards} />
-                          )}
                           {msg.content && <MarkdownRenderer content={msg.content} />}
                           {isLoading && streamingMessageId === msg.id && (
                             <span className="inline-block w-1.5 h-4 ml-1 bg-[#E13C39]/80 animate-pulse align-middle rounded-sm" />
@@ -384,7 +380,7 @@ function AIPageContent() {
                     </div>
                   </div>
                 ))}
-                {isLoading && !activeMessages.some(m => m.role === 'assistant' && m.content === '' && !m.serverCharts) && (
+                {isLoading && !activeMessages.some(m => m.role === 'assistant' && m.content === '') && (
                   <div className="flex gap-2.5 lg:gap-3 mb-4 lg:mb-5">
                     <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-gradient-to-br from-[#FF5C57] to-[#E13C39] text-white font-semibold">
                       AI
