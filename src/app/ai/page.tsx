@@ -14,7 +14,7 @@ import { useConversations } from '@/hooks/useConversations';
 import { HOT_QUESTIONS, AI_DISCLAIMER_TEXT } from '@/lib/constants';
 import { ChatMessage, ChartData, ServerChartData } from '@/types/ai';
 import { mockDraws } from '@/lib/mock/fc3d-draws';
-import { Send, Loader2, Trash2, Sparkles, MessageSquare, Menu } from 'lucide-react';
+import { Send, Loader2, Trash2, Sparkles, MessageSquare, Menu, Square } from 'lucide-react';
 
 const latestPeriod = mockDraws[0]?.period || '---';
 
@@ -35,16 +35,19 @@ function AIPageContent() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [streamingText, setStreamingText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const autoAskFired = useRef(false);
+  const streamControllerRef = useRef<AbortController | null>(null);
   const searchParams = useSearchParams();
 
   const isEmpty = activeMessages.length === 0 && !isLoading;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeMessages]);
+  }, [activeMessages, streamingText]);
 
   useEffect(() => {
     if (initialized && conversations.length === 0 && !activeConversationId) {
@@ -52,36 +55,89 @@ function AIPageContent() {
     }
   }, [initialized, conversations.length, activeConversationId, createConversation]);
 
+  const stopStreaming = useCallback(() => {
+    streamControllerRef.current?.abort();
+    streamControllerRef.current = null;
+    setIsLoading(false);
+    setStreamingMessageId(null);
+    setStreamingText('');
+  }, []);
+
   // Shared streaming function
   const streamAIResponse = useCallback(async (
     apiMessages: Array<{ role: string; content: string }>,
     aiMsgId: string,
   ) => {
+    const controller = new AbortController();
+    streamControllerRef.current = controller;
+
     const res = await fetch('/api/ai/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: apiMessages }),
+      signal: controller.signal,
     });
 
     if (!res.ok) {
-      // Try to parse error from SSE or JSON
       const text = await res.text();
       let errorMsg = `请求失败 (${res.status})`;
       try {
-        // SSE format: event: error\ndata: {...}\n\n
         const dataMatch = text.match(/data:\s*({.*})/);
         if (dataMatch) {
           const parsed = JSON.parse(dataMatch[1]);
           if (parsed.error) errorMsg = parsed.error;
         }
-      } catch { /* ignore */ }
+      } catch {
+        // ignore
+      }
       throw new Error(errorMsg);
     }
 
-    const reader = res.body!.getReader();
+    if (!res.body) {
+      throw new Error('AI 流式响应不可用，请稍后重试');
+    }
+
+    const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
     let accumulatedText = '';
+
+    const processEvent = (chunk: string) => {
+      const lines = chunk.split('\n');
+      let eventType = '';
+      const dataLines: string[] = [];
+
+      for (const line of lines) {
+        if (line.startsWith('event: ')) eventType = line.slice(7);
+        else if (line.startsWith('data: ')) dataLines.push(line.slice(6));
+      }
+
+      if (!eventType || dataLines.length === 0) return;
+
+      const eventData = dataLines.join('\n');
+      const data = JSON.parse(eventData);
+
+      if (eventType === 'meta') {
+        const serverCharts: ServerChartData = {
+          queryType: data.queryType || 'prediction',
+          charts: data.charts || [],
+          dataCards: data.dataCards || [],
+          prediction: data.prediction,
+        };
+        updateMessage(aiMsgId, { serverCharts });
+      } else if (eventType === 'text') {
+        accumulatedText += data.text || '';
+        setStreamingText(accumulatedText);
+        updateMessage(aiMsgId, { content: accumulatedText });
+      } else if (eventType === 'done') {
+        updateMessage(aiMsgId, {
+          content: accumulatedText,
+          disclaimer: true,
+        }, true);
+      } else if (eventType === 'error') {
+        throw new Error(data.error || '未知错误');
+      }
+    };
 
     while (true) {
       const { done, value } = await reader.read();
@@ -92,48 +148,19 @@ function AIPageContent() {
       buffer = parts.pop() || '';
 
       for (const part of parts) {
-        const lines = part.split('\n');
-        let eventType = '';
-        let eventData = '';
-
-        for (const line of lines) {
-          if (line.startsWith('event: ')) eventType = line.slice(7);
-          else if (line.startsWith('data: ')) eventData = line.slice(6);
-        }
-
-        if (!eventType || !eventData) continue;
-
-        try {
-          const data = JSON.parse(eventData);
-
-          if (eventType === 'meta') {
-            // Charts/prediction arrived — show immediately
-            const serverCharts: ServerChartData = {
-              queryType: data.queryType || 'prediction',
-              charts: data.charts || [],
-              dataCards: data.dataCards || [],
-              prediction: data.prediction,
-            };
-            updateMessage(aiMsgId, { serverCharts });
-          } else if (eventType === 'text') {
-            accumulatedText += data.text || '';
-            updateMessage(aiMsgId, { content: accumulatedText });
-          } else if (eventType === 'done') {
-            // Final flush
-            updateMessage(aiMsgId, {
-              content: accumulatedText,
-              disclaimer: true,
-            }, true);
-          } else if (eventType === 'error') {
-            throw new Error(data.error || '未知错误');
-          }
-        } catch (e) {
-          if (e instanceof Error && e.message !== '未知错误') throw e;
-        }
+        if (!part.trim()) continue;
+        processEvent(part);
       }
     }
 
-    // Ensure final save even if no 'done' event
+    const flush = decoder.decode();
+    if (flush) {
+      buffer += flush;
+    }
+    if (buffer.trim()) {
+      processEvent(buffer);
+    }
+
     if (accumulatedText) {
       updateMessage(aiMsgId, { content: accumulatedText, disclaimer: true }, true);
     }
@@ -156,6 +183,10 @@ function AIPageContent() {
 
     addMessage(userMsg);
     setInput('');
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+
     setIsLoading(true);
 
     const aiMsgId = String(Date.now() + 1);
@@ -166,6 +197,8 @@ function AIPageContent() {
       timestamp: Date.now(),
     };
     addMessage(aiMsg);
+    setStreamingMessageId(aiMsgId);
+    setStreamingText('');
 
     try {
       const apiMessages = activeMessages
@@ -175,63 +208,62 @@ function AIPageContent() {
 
       await streamAIResponse(apiMessages, aiMsgId);
     } catch (err) {
-      updateMessage(aiMsgId, {
-        content: `查询出错：${err instanceof Error ? err.message : '未知错误'}。请稍后重试。`,
-      }, true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [input, isLoading, activeMessages, activeConversationId, addMessage, createConversation, streamAIResponse, updateMessage]);
-
-  useEffect(() => {
-    if (autoAskFired.current) return;
-    if (!initialized || !activeConversationId) return;
-
-    const question = searchParams.get('q');
-    if (!question || !question.trim()) return;
-
-    autoAskFired.current = true;
-    const text = question.trim();
-
-    const userMsg: ChatMessage = {
-      id: String(Date.now()),
-      role: 'user',
-      content: text,
-      timestamp: Date.now(),
-    };
-
-    addMessage(userMsg);
-    setIsLoading(true);
-
-    const aiMsgId = String(Date.now() + 1);
-    const aiMsg: ChatMessage = {
-      id: aiMsgId,
-      role: 'assistant',
-      content: '',
-      timestamp: Date.now(),
-    };
-    addMessage(aiMsg);
-
-    (async () => {
-      try {
-        const apiMessages = [{ role: 'user' as const, content: text }];
-        await streamAIResponse(apiMessages, aiMsgId);
-      } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        updateMessage(aiMsgId, {
+          content: streamingText || '已停止生成，你可以继续追问。',
+          disclaimer: !!streamingText,
+        }, true);
+      } else {
         updateMessage(aiMsgId, {
           content: `查询出错：${err instanceof Error ? err.message : '未知错误'}。请稍后重试。`,
         }, true);
+      }
+    } finally {
+      setIsLoading(false);
+      setStreamingMessageId(null);
+      setStreamingText('');
+      streamControllerRef.current = null;
+    }
+  }, [input, isLoading, activeConversationId, createConversation, addMessage, activeMessages, streamAIResponse, updateMessage, streamingText]);
+
+  const autoResizeInput = useCallback((value: string) => {
+    setInput(value);
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+  }, []);
+
+  useEffect(() => {
+    if (!initialized || autoAskFired.current || isLoading) return;
+
+    const q = searchParams.get('q')?.trim();
+    if (!q) return;
+
+    autoAskFired.current = true;
+    (async () => {
+      try {
+        await handleSend(q);
+      } catch (err) {
+        const aiMsgId = String(Date.now() + 1);
+        addMessage({
+          id: aiMsgId,
+          role: 'assistant',
+          content: `查询出错：${err instanceof Error ? err.message : '未知错误'}。请稍后重试。`,
+          timestamp: Date.now(),
+        });
       } finally {
         setIsLoading(false);
       }
     })();
-  }, [initialized, activeConversationId, searchParams, addMessage, streamAIResponse, updateMessage]);
+  }, [initialized, isLoading, searchParams, handleSend, addMessage]);
 
   const allHotQuestions = useMemo(() => {
     return HOT_QUESTIONS.flatMap(cat => cat.questions);
   }, []);
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-white pb-[50px] lg:pb-0">
+    <div className="h-[100dvh] flex flex-col bg-gradient-to-b from-[#fffaf9] via-white to-white pb-[50px] lg:pb-0">
       <Navbar />
 
       <div className="flex-1 flex min-h-0">
@@ -246,8 +278,7 @@ function AIPageContent() {
         />
 
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
-          {/* Chat Header */}
-          <div className="apple-nav sticky top-0 lg:top-11 z-30 shrink-0">
+          <div className="apple-nav sticky top-0 lg:top-11 z-30 shrink-0 border-b border-[#ffe4e2]">
             <div className="max-w-[900px] mx-auto px-3 lg:px-6 py-2.5 lg:py-3 flex items-center justify-between">
               <div className="flex items-center gap-2.5 lg:gap-3">
                 <button
@@ -256,13 +287,13 @@ function AIPageContent() {
                 >
                   <Menu size={18} />
                 </button>
-                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl bg-[#E13C39] flex items-center justify-center">
+                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl bg-gradient-to-br from-[#FF5C57] to-[#E13C39] shadow-[0_6px_20px_rgba(225,60,57,0.35)] flex items-center justify-center">
                   <Sparkles size={14} className="text-white lg:hidden" />
                   <Sparkles size={16} className="text-white hidden lg:block" />
                 </div>
                 <div>
-                  <h3 className="text-[13px] lg:text-[14px] font-semibold text-[#1d1d1f] leading-tight">AI 智能分析</h3>
-                  <div className="text-[11px] lg:text-[12px] text-[#8e8e93] mt-0.5">数据已更新至第 {latestPeriod} 期</div>
+                  <h3 className="text-[13px] lg:text-[14px] font-semibold text-[#1d1d1f] leading-tight">AI 智能分析引擎</h3>
+                  <div className="text-[11px] lg:text-[12px] text-[#8e8e93] mt-0.5">实时流式输出 · 数据已更新至第 {latestPeriod} 期</div>
                 </div>
               </div>
               <button
@@ -275,14 +306,12 @@ function AIPageContent() {
             </div>
           </div>
 
-          {/* Scrollable content area */}
           <div className="flex-1 overflow-y-auto overscroll-contain">
             {isEmpty ? (
               <div className="flex flex-col min-h-full">
-                {/* Hero section */}
                 <div className="flex flex-col items-center justify-center px-4 pt-8 pb-6 lg:pt-12 lg:pb-8">
                   <div className="text-center max-w-lg mx-auto">
-                    <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-[#E13C39] flex items-center justify-center mx-auto mb-4">
+                    <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-gradient-to-br from-[#FF5C57] to-[#E13C39] shadow-[0_10px_30px_rgba(225,60,57,0.32)] flex items-center justify-center mx-auto mb-4">
                       <Sparkles size={24} className="text-white lg:hidden" />
                       <Sparkles size={28} className="text-white hidden lg:block" />
                     </div>
@@ -295,15 +324,13 @@ function AIPageContent() {
                   </div>
                 </div>
 
-                {/* Hot Questions */}
                 <div className="flex-1 px-3 pb-3 lg:px-6 lg:pb-4">
                   <HotQuestions onSelect={handleSend} disabled={isLoading} />
                 </div>
               </div>
             ) : (
               <div className="px-3 py-4 max-w-[900px] mx-auto w-full lg:px-6 lg:py-5">
-                {/* Disclaimer */}
-                <div className="p-3 bg-[#f5f5f7] rounded-xl mb-4">
+                <div className="p-3 bg-gradient-to-r from-[#fff5f4] to-[#fff] border border-[#ffe4e2] rounded-xl mb-4">
                   <p className="text-[11px] lg:text-[12px] text-[#8e8e93] leading-relaxed">
                     {AI_DISCLAIMER_TEXT}
                   </p>
@@ -316,15 +343,15 @@ function AIPageContent() {
                   >
                     <div className={`w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] font-semibold ${
                       msg.role === 'assistant'
-                        ? 'bg-[#E13C39] text-white'
+                        ? 'bg-gradient-to-br from-[#FF5C57] to-[#E13C39] text-white shadow-[0_4px_14px_rgba(225,60,57,0.28)]'
                         : 'bg-[#f5f5f7] text-[#8e8e93]'
                     }`}>
                       {msg.role === 'assistant' ? 'AI' : 'Me'}
                     </div>
-                    <div className={`px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl text-[13px] lg:text-[14px] leading-relaxed max-w-[85%] lg:max-w-[82%] ${
+                    <div className={`px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl text-[13px] lg:text-[14px] leading-relaxed max-w-[90%] lg:max-w-[85%] border ${
                       msg.role === 'assistant'
-                        ? 'bg-[#f5f5f7] text-[#1d1d1f]'
-                        : 'bg-[#E13C39] text-white'
+                        ? 'bg-white text-[#1d1d1f] border-[#f0d7d5] shadow-[0_8px_30px_rgba(225,60,57,0.08)]'
+                        : 'bg-[#E13C39] text-white border-transparent'
                     }`}>
                       {msg.role === 'assistant' ? (
                         <>
@@ -342,6 +369,9 @@ function AIPageContent() {
                             <DataCardGrid cards={msg.serverCharts.dataCards} />
                           )}
                           {msg.content && <MarkdownRenderer content={msg.content} />}
+                          {isLoading && streamingMessageId === msg.id && (
+                            <span className="inline-block w-1.5 h-4 ml-1 bg-[#E13C39]/80 animate-pulse align-middle rounded-sm" />
+                          )}
                         </>
                       ) : (
                         <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -356,10 +386,10 @@ function AIPageContent() {
                 ))}
                 {isLoading && !activeMessages.some(m => m.role === 'assistant' && m.content === '' && !m.serverCharts) && (
                   <div className="flex gap-2.5 lg:gap-3 mb-4 lg:mb-5">
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-[#E13C39] text-white font-semibold">
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] lg:text-[11px] bg-gradient-to-br from-[#FF5C57] to-[#E13C39] text-white font-semibold">
                       AI
                     </div>
-                    <div className="px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl bg-[#f5f5f7] text-[13px] lg:text-[14px] text-[#8e8e93]">
+                    <div className="px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-2xl bg-white border border-[#f0d7d5] shadow-[0_8px_30px_rgba(225,60,57,0.08)] text-[13px] lg:text-[14px] text-[#8e8e93]">
                       <Loader2 size={14} className="animate-spin inline mr-1.5" />
                       正在分析数据...
                     </div>
@@ -370,8 +400,7 @@ function AIPageContent() {
             )}
           </div>
 
-          {/* Bottom bar: hot questions + input */}
-          <div className="shrink-0 border-t border-[#e5e5ea] bg-white">
+          <div className="shrink-0 border-t border-[#f1dfdd] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
             {!isEmpty && (
               <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 pt-2 pb-0.5 overflow-x-auto scrollbar-hidden">
                 <div className="flex gap-2 w-max">
@@ -380,7 +409,7 @@ function AIPageContent() {
                       key={q.id}
                       onClick={() => handleSend(q.question)}
                       disabled={isLoading}
-                      className="px-3 py-1.5 rounded-full text-[12px] text-[#1d1d1f] bg-[#f5f5f7] hover:bg-[#e5e5ea] transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-full text-[12px] text-[#1d1d1f] bg-[#f5f5f7] hover:bg-[#ececef] transition-all disabled:opacity-30 whitespace-nowrap flex items-center gap-1"
                     >
                       <span>{q.icon}</span>
                       {q.label}
@@ -390,27 +419,41 @@ function AIPageContent() {
               </div>
             )}
 
-            {/* Input */}
             <div className="max-w-[900px] mx-auto w-full px-3 lg:px-6 py-2 flex gap-2 items-end">
-              <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-full px-4 py-2.5 lg:px-5 lg:py-3 gap-2 focus-within:ring-2 focus-within:ring-[#E13C39]/20 transition-all">
-                <MessageSquare size={14} className="text-[#8e8e93]/70 shrink-0" />
-                <input
+              <div className="flex-1 flex items-end bg-[#f5f5f7] rounded-2xl px-3.5 py-2.5 lg:px-4 lg:py-3 gap-2.5 focus-within:ring-2 focus-within:ring-[#E13C39]/20 transition-all border border-transparent focus-within:border-[#f0d7d5]">
+                <MessageSquare size={15} className="text-[#8e8e93]/70 shrink-0 mb-1" />
+                <textarea
                   ref={inputRef}
                   value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                  disabled={isLoading}
-                  className="flex-1 bg-transparent text-[13px] lg:text-[14px] outline-none placeholder:text-[#8e8e93]/50 text-[#1d1d1f] disabled:opacity-50"
-                  placeholder="输入问题，如：下期推荐号码..."
+                  rows={1}
+                  onChange={e => autoResizeInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  className="flex-1 bg-transparent text-[13px] lg:text-[14px] outline-none placeholder:text-[#8e8e93]/50 text-[#1d1d1f] resize-none max-h-[140px]"
+                  placeholder="输入问题（Enter 发送，Shift+Enter 换行）..."
                 />
               </div>
-              <button
-                onClick={() => handleSend()}
-                disabled={isLoading || !input.trim()}
-                className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-[#E13C39] flex items-center justify-center text-white shrink-0 hover:bg-[#c22d2b] transition-all disabled:opacity-30"
-              >
-                <Send size={15} />
-              </button>
+              {isLoading ? (
+                <button
+                  onClick={stopStreaming}
+                  className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-[#1d1d1f] flex items-center justify-center text-white shrink-0 hover:bg-black transition-all"
+                  title="停止生成"
+                >
+                  <Square size={13} fill="currentColor" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleSend()}
+                  disabled={!input.trim()}
+                  className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-gradient-to-br from-[#FF5C57] to-[#E13C39] flex items-center justify-center text-white shrink-0 hover:brightness-95 transition-all disabled:opacity-30"
+                >
+                  <Send size={15} />
+                </button>
+              )}
             </div>
           </div>
         </div>
